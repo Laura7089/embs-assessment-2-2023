@@ -35,7 +35,7 @@ wordcount question="1":
         | wc -w > ./word_count.txt
 
 clean:
-    find -iname "main*" \
+    find -iname "submission*" \
         -and -not -iwholename "{{ ROOT_TEX_FILE }}" \
         -exec rm -fv {} \;
-    rm -fv word_count.txt
+    rm -fv word_count.txt texput.log

@@ -1,0 +1,41 @@
+#!/bin/env -S just --justfile
+
+SOURCE_DIR := "../source"
+ROOT_TEX_FILE := "./submission.tex"
+
+# Compile a report, select builder dynamically
+report builder="pdflatex":
+    just report_{{builder}}
+
+# Compile a report with `latexmk`
+report_latexmk: supporting
+    latexmk --pdf
+
+# Compile a report with `pdflatex`
+report_pdflatex: supporting
+    pdflatex {{ ROOT_TEX_FILE }}
+    pdflatex {{ ROOT_TEX_FILE }}
+
+# Create all supporting material
+supporting: exam_number wordcount
+
+# Create a dummy `exam_number.txt` file if needed
+exam_number:
+    #!/bin/env bash
+    if [[ -f exam_number.txt ]]; then
+        echo "Skipping dummy exam number...";
+    else
+        echo "Creating dummy exam number...";
+        echo "Sample Author" >> exam_number.txt;
+    fi
+
+# Count words in the report
+wordcount question="1":
+    detex {{ ROOT_TEX_FILE }} \
+        | wc -w > ./word_count.txt
+
+clean:
+    find -iname "main*" \
+        -and -not -iwholename "{{ ROOT_TEX_FILE }}" \
+        -exec rm -fv {} \;
+    rm -fv word_count.txt

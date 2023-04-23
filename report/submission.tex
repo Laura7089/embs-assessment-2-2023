@@ -1,0 +1,50 @@
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[nottoc,numbib]{tocbibind}
+\usepackage[a4paper, margin=2cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[toc,acronym,nonumberlist]{glossaries}
+\usepackage{graphicx}
+
+% From https://tex.stackexchange.com/questions/116534/lstlisting-line-wrapping
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\lstset{
+  columns=fullflexible,
+  frame=single,
+  numbers=left,
+  breaklines=true,
+  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+}
+
+\graphicspath{{./images/}}
+
+\title{EMBS Assessment 2}
+\author{\input{./exam_number.txt}}
+\date{April 2023}
+
+\makeglossaries
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+Word Count: \input{./word_count.txt}
+\tableofcontents
+\end{titlepage}
+
+\section{System Design}
+
+\newpage
+\section{Parallelism in the System}
+
+\newpage
+\section{Evaluation and Testing}
+
+\printglossary
+\printglossary[type=\acronymtype]
+
+\end{document}

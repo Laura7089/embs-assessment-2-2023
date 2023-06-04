@@ -1,11 +1,19 @@
 #include <stdio.h>
 #include "tile.h"
 
+// Rubric image example
+// lilac = 0
+// blue = 1
+// green = 2
+// yellow = 3
+// red = 4
+// cyan = 5
+
 int main(int argc, char** argv) {
-    colour t_colours[] = {1, 2, 3, 4};
-    tile t;
-    t.rotation = 0;
-    t.colours = t_colours;
+    tile t = {
+        {1, 2, 3, 4},
+        0,
+    };
 
     rotate_left(&t);
     print_tile(t);

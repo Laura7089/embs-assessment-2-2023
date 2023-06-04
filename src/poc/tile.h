@@ -1,7 +1,7 @@
 typedef unsigned char colour;
 
 typedef struct {
-    colour* colours;
+    colour colours[4];
     char rotation;
 } tile;
 

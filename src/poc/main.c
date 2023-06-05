@@ -12,11 +12,13 @@ int main(int argc, char** argv) {
 
     field f = new_field(2);
     f.tiles = rubric_tiles;
+    place(&f, 0, c(0, 0)); // Place a tile to get it started
 
     int solved;
     solve(&f, &solved);
 
     printf("Solved: %d\n", solved);
 
+    free_bufs(&f);
     return 0;
 }

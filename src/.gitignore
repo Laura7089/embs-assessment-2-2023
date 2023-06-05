@@ -109,3 +109,9 @@ hw_handoff
 ipshared
 
 # End of https://www.toptal.com/developers/gitignore/api/xilinx,xilinxvivado
+
+!poc/*.c
+!poc/*.h
+
+.env
+*.vlabkey

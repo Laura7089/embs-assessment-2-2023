@@ -1,3 +1,16 @@
 #!/bin/env -S just --justfile
+set dotenv-load
+
+YORK_USER := env_var("YORK_USER")
 
 clean:
+
+ssh_keepalive:
+    ssh -X -o ServerAliveInterval=30 -fN ssh.york.ac.uk
+
+vlab *args="":
+    chmod 0600 {{ YORK_USER }}.vlabkey
+    python3 ./VLAB/vlab.py \
+        --user {{ YORK_USER }} \
+        --key {{ YORK_USER }}.vlabkey \
+        {{ args }}

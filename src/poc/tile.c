@@ -26,3 +26,23 @@ void print_tile(tile t) {
             get_side(t, left)
           );
 }
+
+int has_cseq(tile t, colour* colours, unsigned int num_colours) {
+    // Start from each side
+    for (int s = 0; s < 4; s++) {
+        int valid = 1;
+
+        for (int i = 0; i < num_colours; i++) {
+            if (get_side(t, s + i) != colours[i]) {
+                valid = 0;
+                break;
+            }
+        }
+
+        if (valid) {
+            return 1;
+        }
+    }
+
+    return 0;
+}

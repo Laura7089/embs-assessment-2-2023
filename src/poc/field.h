@@ -1,3 +1,6 @@
+#ifndef FIELD
+#define FIELD
+
 #include "tile.h"
 
 typedef struct {
@@ -11,9 +14,8 @@ typedef struct {
     //
     // We indicate an empty space by setting it to `f.num_tiles`
     unsigned int* inner;
-    // Dimensions of `inner`
-    unsigned int width;
-    unsigned int height;
+    // Side length of `inner`
+    unsigned int side;
 } field;
 
 // Index into `f.inner`, get index into `f.tiles` for the tile there
@@ -28,4 +30,31 @@ tile* idxt(field* f, unsigned int x, unsigned int y);
 //
 // `tiles` of the returned object is allocated but points to invalid data.
 // Caller must insert tiles as needed.
-field new_field(unsigned int num_tiles, unsigned int width, unsigned int height);
+field new_field(unsigned int num_tiles, unsigned int size);
+// Get a (deep) copy of `f`
+field copy(field* f);
+
+// Check if a tile (index `t`) fits into `f` at `(x, y)`.
+int tile_fits(field* f, unsigned int t, unsigned int x, unsigned int y);
+// Count how many tiles in `f` haven't been placed yet
+unsigned int num_unplaced(field* f);
+
+// Determine if an index falls on the edge of the field
+int is_edge(field* f, unsigned int x, unsigned int y);
+// Shift all placed tiles in the direction of the given side
+//
+// This is a noop if this would push any tiles out of play
+void shift(field* f, side s);
+// Check if the placed tiles in `f` touch the edge of the field on side `s`
+int touches_edge(field* f, side s);
+
+// Place tile index `t` onto the field at `(x, y)`
+//
+// If `t` is already placed, do nothing
+void place(field* f, unsigned int t, unsigned int x, unsigned int y);
+// Remove the tile at `(x, y)` from `f`
+//
+// If there is no tile there, do nothing
+void unplace(field* f, unsigned int x, unsigned int y);
+
+#endif

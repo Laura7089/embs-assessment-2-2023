@@ -1,3 +1,6 @@
+#ifndef TILE
+#define TILE
+
 typedef unsigned char colour;
 
 typedef struct {
@@ -26,5 +29,12 @@ int matches(tile base, tile other, side s);
 // Find the colour on the given `side` of `t`
 colour get_side(tile t, side s);
 
+// Determine if the sequence `colours` occurs on `t`
+//
+// `num_colours` should be the length of `colours`.
+int has_cseq(tile t, colour* colours, unsigned int num_colours);
+
 // Write a representation of `t` to stdout, top first
 void print_tile(tile t);
+
+#endif

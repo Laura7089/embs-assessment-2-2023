@@ -81,6 +81,16 @@ void test_fits(void) {
     TEST_ASSERT(tile_fits(&f, 1, 0, 1));
     TEST_ASSERT(tile_fits(&f, 2, 0, 1));
     TEST_ASSERT(!tile_fits(&f, 3, 0, 1));
+    // Test fits in tile (1, 0)
+    // None can fit because none have blue
+    TEST_ASSERT(!tile_fits(&f, 1, 1, 0));
+    TEST_ASSERT(!tile_fits(&f, 2, 1, 0));
+    TEST_ASSERT(!tile_fits(&f, 3, 1, 0));
+    // Test fits in tile (1, 1)
+    // All should fit because nothing borders this space
+    TEST_ASSERT(tile_fits(&f, 1, 1, 1));
+    TEST_ASSERT(tile_fits(&f, 2, 1, 1));
+    TEST_ASSERT(tile_fits(&f, 3, 1, 1));
 
     free_bufs(&f);
 }

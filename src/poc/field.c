@@ -128,7 +128,7 @@ int tile_fits(field* f, unsigned int t, coord cs) {
         needed_colours[s] = get_side(f->tiles[adj], opposite(s));
     }
 
-    tile ti = f->tiles[t];
+    tile* ti = &f->tiles[t];
     // Try matching the colours to the file in 4 different rotations
     // TODO: there's room for optimisation here...
     for (int _r = 0; _r < 4; _r++) {
@@ -136,7 +136,7 @@ int tile_fits(field* f, unsigned int t, coord cs) {
         for (int s = 0; s < 4; s++) {
             if (needed_colours[s] == invalid) {
                 continue;
-            } else if (get_side(ti, s) != needed_colours[s]) {
+            } else if (get_side(*ti, s) != needed_colours[s]) {
                 fits = 0;
                 break;
             }
@@ -146,7 +146,7 @@ int tile_fits(field* f, unsigned int t, coord cs) {
             return 1;
         }
 
-        rotate_right(&ti);
+        rotate_right(ti);
     }
 
     return 0;
@@ -290,4 +290,81 @@ unsigned int free_cells(field* f, coord* buf) {
     }
 
     return bi;
+}
+
+int try_place(field* f, unsigned int t, coord cs) {
+    if (f->placed[t] || idx(f, cs) != f->num_tiles) {
+        return 0;
+    }
+
+    if (tile_fits(f, t, cs)) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+int try_place_any(field* f, coord cs) {
+    for (int t = 0; t < f->num_tiles; t++) {
+        if (try_place(f, t, cs)) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+void solve(field* f, int* solved) {
+    *solved = 0;
+
+    coord* frees = malloc((f->num_tiles-1) * sizeof(coord));
+    unsigned int num_free = free_cells(f, frees);
+
+    // Base case
+    if (num_free == 1) {
+        if (try_place_any(f, frees[0])) {
+            *solved = 1;
+            return;
+        }
+    }
+
+    // Recursive case(s)
+    // Case 1: plain ol' placing
+    for (int i = 0; i < num_free; i++) {
+        field fs = copy(f);
+        if (try_place_any(&fs, frees[i])) {
+            solve(&fs, solved);
+            if (*solved) {
+                // Overwrite the original
+                free_bufs(f);
+                memcpy(f, &fs, sizeof(field));
+                return;
+            }
+        }
+    }
+
+    // Case 2: start shiftin'
+    for (int d = 0; d < 4; d++) {
+        if (touches_edge(f, d)) {
+            continue;
+        }
+
+        // Make a copy and shift it in the given direction
+        field fs = copy(f);
+        shift(&fs, d);
+        // Try to place a tile
+        coord* frees = malloc((fs.num_tiles-1) * sizeof(coord));
+        unsigned int num_free = free_cells(&fs, frees);
+        for (int i = 0; i < num_free; i++) {
+            if (try_place_any(&fs, frees[i])) {
+                solve(&fs, solved);
+                if (*solved) {
+                    // Overwrite the original
+                    free_bufs(f);
+                    memcpy(f, &fs, sizeof(field));
+                    return;
+                }
+            }
+        }
+    }
 }

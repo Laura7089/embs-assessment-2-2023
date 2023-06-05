@@ -46,6 +46,8 @@ field copy(field* f);
 void free_bufs(field* f);
 
 // Check if a tile (index `t`) fits into `f` at `(x, y)`.
+//
+// If it does fit, this function will also rotate it appropriately.
 int tile_fits(field* f, unsigned int t, coord cs);
 // Count how many tiles in `f` haven't been placed yet
 unsigned int num_unplaced(field* f);
@@ -61,8 +63,17 @@ int touches_edge(field* f, side s);
 
 // Place tile index `t` onto the field at `(x, y)`
 //
-// If `t` is already placed, do nothing
+// If `t` is already placed, do nothing.
+// This does not check if the tile will fit.
 void place(field* f, unsigned int t, coord cs);
+// Try to fit `t` into `cs`, in any rotation; return whether successful
+//
+// Returns early (with `0`) if `t` is already placed or `cs` has a tile there.
+int try_place(field* f, unsigned int t, coord cs);
+// As with `try_place`, but try to place *any* unplaced tile into `cs`
+//
+// Returns with `0` if none fit.
+int try_place_any(field* f, coord cs);
 // Remove the tile at `(x, y)` from `f`
 //
 // If there is no tile there, do nothing
@@ -74,5 +85,12 @@ int is_full(field* f);
 //
 // Returns length of data written to `buf`
 unsigned int free_cells(field* f, coord* buf);
+
+// Find a solution to the puzzle.
+//
+// Expects at least one tile to be placed.
+// If it finds a solution, mutates `f` and writes a `1` to `solved`.
+// If not, `solved` is set to `0` and the final state of `f` is unknown.
+void solve(field* f, int* solved);
 
 #endif

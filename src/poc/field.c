@@ -7,7 +7,7 @@
 // This is not part of public API
 unsigned int* idxp(field* f, unsigned int x, unsigned int y) {
     // Column- vs row-major ordering doesn't matter here
-    return &(f->inner[(x * f->side) + y]);
+    return &(f->inner[(x * f->num_tiles) + y]);
 }
 unsigned int idx(field* f, unsigned int x, unsigned int y) {
     return *idxp(f, x, y);
@@ -35,16 +35,15 @@ void unplace(field* f, unsigned int x, unsigned int y) {
     f->placed[t] = 0;
 }
 
-field new_field(unsigned int num_tiles, unsigned int size) {
+field new_field(unsigned int num_tiles) {
     field f;
     f.num_tiles = num_tiles;
-    f.side = size;
     f.placed = calloc(num_tiles, sizeof(int));
     // TODO: is there a way to `malloc` these in the same place?
     f.tiles = malloc(sizeof(tile) * num_tiles);
-    f.inner = malloc(sizeof(unsigned int) * size * size);
+    f.inner = malloc(sizeof(unsigned int) * num_tiles * num_tiles);
 
-    for (int i = 0; i < (size * size); i++) {
+    for (int i = 0; i < (num_tiles * num_tiles); i++) {
         f.inner[i] = num_tiles;
     }
 

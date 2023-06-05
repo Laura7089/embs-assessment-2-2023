@@ -14,8 +14,6 @@ typedef struct {
     //
     // We indicate an empty space by setting it to `f.num_tiles`
     unsigned int* inner;
-    // Side length of `inner`
-    unsigned int side;
 } field;
 
 // Index into `f.inner`, get index into `f.tiles` for the tile there
@@ -28,9 +26,10 @@ tile* idxt(field* f, unsigned int x, unsigned int y);
 
 // Create and allocate a new `field`
 //
+// `num_tiles` is also the side length of the field.
 // `tiles` of the returned object is allocated but points to invalid data.
 // Caller must insert tiles as needed.
-field new_field(unsigned int num_tiles, unsigned int size);
+field new_field(unsigned int num_tiles);
 // Get a (deep) copy of `f`
 field copy(field* f);
 // Free the buffers in `f` (but not the object itself)

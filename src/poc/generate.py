@@ -55,7 +55,10 @@ def c_literal(tiles):
         return "{{ {{ {} }}, 0 }}".format(", ".join(map(str, tile)))
 
     tile_list = "{\n\t" + ",\n\t".join(map(tlit, tiles)) + "\n}"
-    return f"tile TILES[{len(tiles)}] = {tile_list};\nunsigned int NTILES = {len(tiles)};"
+    return f"""#include "tile.h"
+
+tile TILES[{len(tiles)}] = {tile_list};
+unsigned int NTILES = {len(tiles)};"""
 
 
 if __name__ == "__main__":

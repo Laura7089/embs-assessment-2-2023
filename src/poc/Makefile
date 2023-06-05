@@ -8,3 +8,4 @@ default: main.c tile.c field.c
 
 clean:
 	rm -fv main
+	rm -rfv known_solvable

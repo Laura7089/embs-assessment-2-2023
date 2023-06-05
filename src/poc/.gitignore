@@ -60,3 +60,4 @@ dkms.conf
 tests/run*
 main
 __pycache__
+known_solvable

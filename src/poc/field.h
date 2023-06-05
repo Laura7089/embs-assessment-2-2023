@@ -33,6 +33,8 @@ tile* idxt(field* f, unsigned int x, unsigned int y);
 field new_field(unsigned int num_tiles, unsigned int size);
 // Get a (deep) copy of `f`
 field copy(field* f);
+// Free the buffers in `f` (but not the object itself)
+void free_bufs(field* f);
 
 // Check if a tile (index `t`) fits into `f` at `(x, y)`.
 int tile_fits(field* f, unsigned int t, unsigned int x, unsigned int y);

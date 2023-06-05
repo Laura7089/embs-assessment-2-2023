@@ -67,6 +67,11 @@ field copy(field* f) {
     return fnew;
 }
 
+void free_bufs(field* f) {
+    free(f->tiles);
+    free(f->inner);
+    free(f->placed);
+}
 
 int tile_fits(field* f, unsigned int t, unsigned int x, unsigned int y) {
     // TODO

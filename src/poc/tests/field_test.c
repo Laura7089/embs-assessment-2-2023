@@ -41,6 +41,13 @@ void test_place(void) {
     TEST_ASSERT_EQUAL(idx(&f, 1, 1), 4);
     TEST_ASSERT(f.placed[0]);
 
+    unplace(&f, 0, 0);
+    TEST_ASSERT_EQUAL(idx(&f, 0, 0), 4);
+    TEST_ASSERT_EQUAL(idx(&f, 0, 1), 4);
+    TEST_ASSERT_EQUAL(idx(&f, 1, 0), 4);
+    TEST_ASSERT_EQUAL(idx(&f, 1, 1), 4);
+    TEST_ASSERT(!f.placed[0]);
+
     free_bufs(&f);
 }
 

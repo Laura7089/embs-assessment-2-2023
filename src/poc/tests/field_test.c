@@ -1,5 +1,5 @@
 #include <string.h>
-#include "unity/src/unity.h"
+#include "unity.h"
 #include "../field.h"
 #include "../tile.h"
 
@@ -68,15 +68,4 @@ void test_shift(void) {
     TEST_ASSERT_EQUAL(idx(&f, 1, 1), 4);
 
     free_bufs(&f);
-}
-
-int main(void) {
-    UNITY_BEGIN();
-
-    RUN_TEST(test_create);
-    RUN_TEST(test_place);
-    RUN_TEST(test_touches_edge);
-    RUN_TEST(test_shift);
-
-    return UNITY_END();
 }

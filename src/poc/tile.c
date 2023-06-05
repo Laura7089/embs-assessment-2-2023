@@ -46,3 +46,16 @@ int has_cseq(tile t, colour* colours, unsigned int num_colours) {
 
     return 0;
 }
+
+side opposite(side s) {
+    switch (s) {
+    case top:
+        return bottom;
+    case right:
+        return left;
+    case bottom:
+        return top;
+    case left:
+        return right;
+    }
+}

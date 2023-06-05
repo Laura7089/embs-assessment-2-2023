@@ -37,4 +37,7 @@ int has_cseq(tile t, colour* colours, unsigned int num_colours);
 // Write a representation of `t` to stdout, top first
 void print_tile(tile t);
 
+// Get the opposite `side` to `s`
+side opposite(side s);
+
 #endif

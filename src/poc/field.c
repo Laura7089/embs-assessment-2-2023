@@ -2,18 +2,48 @@
 #include <string.h>
 #include "field.h"
 
+// Get index into `f.inner` that `(x, y)` represent
+//
+// Not part of public API
+unsigned int flatten(field* f, unsigned int x, unsigned int y) {
+    return (x * f->size) + y;
+}
 // Get a pointer to a particular index of `inner`
 //
 // This is not part of public API
 unsigned int* idxp(field* f, unsigned int x, unsigned int y) {
     // Column- vs row-major ordering doesn't matter here
-    return &(f->inner[(x * f->size) + y]);
+    return &(f->inner[flatten(f, x, y)]);
 }
 unsigned int idx(field* f, unsigned int x, unsigned int y) {
     return *idxp(f, x, y);
 }
 tile* idxt(field* f, unsigned int x, unsigned int y) {
     return &(f->tiles[idx(f, x, y)]);
+}
+unsigned int idxo(field* f, unsigned int x, unsigned int y, side s) {
+    switch (s) {
+    case bottom:
+        if (y == 0) {
+            return f->num_tiles;
+        }
+        return f->inner[flatten(f, x, y-1)];
+    case top:
+        if (y >= f->size-1) {
+            return f->num_tiles;
+        }
+        return f->inner[flatten(f, x, y+1)];
+    case left:
+        if (x == 0) {
+            return f->num_tiles;
+        }
+        return f->inner[flatten(f, x-1, y)];
+    case right:
+        if (x == f->size-1) {
+            return f->num_tiles;
+        }
+        return f->inner[flatten(f, x+1, y)];
+    }
 }
 
 void place(field* f, unsigned int t, unsigned int x, unsigned int y) {
@@ -77,7 +107,49 @@ void free_bufs(field* f) {
 }
 
 int tile_fits(field* f, unsigned int t, unsigned int x, unsigned int y) {
-    // TODO
+    // Figure out the sequence of colours we need
+    colour invalid = 127;
+    colour needed_colours[4];
+    for (int s = 0; s < 4; s++) {
+        unsigned int i = idxo(f, x, y, s);
+        if (i == f->num_tiles) {
+            // Location is out of bounds
+            needed_colours[s] = invalid;
+            continue;
+        }
+
+        unsigned int adj = f->inner[i];
+        if (adj == f->num_tiles) {
+            // No tile is placed there ergo anything will fit
+            needed_colours[s] = invalid;
+            continue;
+        }
+
+        needed_colours[s] = get_side(f->tiles[adj], opposite(s));
+    }
+
+    tile ti = f->tiles[t];
+    // Try matching the colours to the file in 4 different rotations
+    // TODO: there's room for optimisation here...
+    for (int _r = 0; _r < 4; _r++) {
+        int fits = 1;
+        for (int s = 0; s < 4; s++) {
+            if (needed_colours[s] == invalid) {
+                continue;
+            } else if (get_side(ti, s) != needed_colours[s]) {
+                fits = 0;
+                break;
+            }
+        }
+
+        if (fits) {
+            return 1;
+        }
+
+        rotate_right(&ti);
+    }
+
+    return 0;
 }
 
 unsigned int num_unplaced(field* f) {

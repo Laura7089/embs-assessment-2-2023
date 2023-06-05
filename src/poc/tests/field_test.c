@@ -39,6 +39,7 @@ void test_place(void) {
     TEST_ASSERT_EQUAL(idx(&f, 0, 1), 4);
     TEST_ASSERT_EQUAL(idx(&f, 1, 0), 4);
     TEST_ASSERT_EQUAL(idx(&f, 1, 1), 4);
+    TEST_ASSERT(f.placed[0]);
 
     free_bufs(&f);
 }
@@ -66,6 +67,20 @@ void test_shift(void) {
     TEST_ASSERT_EQUAL(idx(&f, 0, 1), 0);
     TEST_ASSERT_EQUAL(idx(&f, 1, 0), 4);
     TEST_ASSERT_EQUAL(idx(&f, 1, 1), 4);
+
+    free_bufs(&f);
+}
+
+void test_fits(void) {
+    field f = get_rubric_example();
+    // Place the first tile in the bottom-left corner
+    place(&f, 0, 0, 0);
+
+    // Test fits in tile (0, 1)
+    // Tile 3 doesn't fit, the other two do
+    TEST_ASSERT(tile_fits(&f, 1, 0, 1));
+    TEST_ASSERT(tile_fits(&f, 2, 0, 1));
+    TEST_ASSERT(!tile_fits(&f, 3, 0, 1));
 
     free_bufs(&f);
 }

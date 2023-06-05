@@ -21,9 +21,12 @@ typedef struct {
 //
 // Returns `f.num_tiles` if no tile is placed there
 unsigned int idx(field* f, unsigned int x, unsigned int y);
-
 // Index into `f.inner`, get pointer to tile there
 tile* idxt(field* f, unsigned int x, unsigned int y);
+// Index into `f.inner` but offset one step out from `s`
+//
+// Returns `f.num_tiles` if that cell is out of bounds
+unsigned int idxo(field* f, unsigned int x, unsigned int y, side s);
 
 // Create and allocate a new `field`
 //

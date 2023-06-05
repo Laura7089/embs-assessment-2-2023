@@ -68,10 +68,28 @@ void test_shift(void) {
     field f = get_rubric_example();
     // Place the first tile in the bottom-left corner
     place(&f, 0, c(0, 0));
-    shift(&f, top);
 
+    shift(&f, top);
     TEST_ASSERT_EQUAL(idx(&f, c(0, 0)), 4);
     TEST_ASSERT_EQUAL(idx(&f, c(0, 1)), 0);
+    TEST_ASSERT_EQUAL(idx(&f, c(1, 0)), 4);
+    TEST_ASSERT_EQUAL(idx(&f, c(1, 1)), 4);
+
+    shift(&f, right);
+    TEST_ASSERT_EQUAL(idx(&f, c(0, 0)), 4);
+    TEST_ASSERT_EQUAL(idx(&f, c(0, 1)), 4);
+    TEST_ASSERT_EQUAL(idx(&f, c(1, 0)), 4);
+    TEST_ASSERT_EQUAL(idx(&f, c(1, 1)), 0);
+
+    shift(&f, bottom);
+    TEST_ASSERT_EQUAL(idx(&f, c(0, 0)), 4);
+    TEST_ASSERT_EQUAL(idx(&f, c(0, 1)), 4);
+    TEST_ASSERT_EQUAL(idx(&f, c(1, 0)), 0);
+    TEST_ASSERT_EQUAL(idx(&f, c(1, 1)), 4);
+
+    shift(&f, left);
+    TEST_ASSERT_EQUAL(idx(&f, c(0, 0)), 0);
+    TEST_ASSERT_EQUAL(idx(&f, c(0, 1)), 4);
     TEST_ASSERT_EQUAL(idx(&f, c(1, 0)), 4);
     TEST_ASSERT_EQUAL(idx(&f, c(1, 1)), 4);
 

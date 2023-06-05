@@ -258,3 +258,36 @@ int touches_edge(field* f, side s) {
 
     return 0;
 }
+
+int is_full(field* f) {
+    return (num_unplaced(f) == 0);
+}
+
+unsigned int free_cells(field* f, coord* buf) {
+    if (is_full(f)) {
+        return 0;
+    }
+
+    unsigned int bi = 0;
+
+    for (int x = 0; x < f->size; x++) {
+        for (int y = 0; y < f->size; y++) {
+            coord cs = c(x, y);
+            if (idx(f, cs) != f->num_tiles) {
+                // There's already a tile here
+                continue;
+            }
+
+            for (int s = 0; s < 4; s++) {
+                if (idxo(f, cs, s) != f->num_tiles) {
+                    // There's a placed tile adjacent!
+                    buf[bi] = cs;
+                    bi += 1;
+                    break;
+                }
+            }
+        }
+    }
+
+    return bi;
+}

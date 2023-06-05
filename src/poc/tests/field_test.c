@@ -119,3 +119,24 @@ void test_fits(void) {
 
     free_bufs(&f);
 }
+
+void test_free_spaces(void) {
+    field f = get_rubric_example();
+    // Place the first tile in the bottom-left corner
+    place(&f, 0, c(0, 0));
+
+    coord free[4] = { c(10, 10), c(10, 10), c(10, 10), c(10, 10) };
+    unsigned int num_free = free_cells(&f, free);
+
+    TEST_ASSERT_EQUAL(num_free, 2);
+    TEST_ASSERT_EQUAL(free[0].x, 0);
+    TEST_ASSERT_EQUAL(free[0].y, 1);
+    TEST_ASSERT_EQUAL(free[1].x, 1);
+    TEST_ASSERT_EQUAL(free[1].y, 0);
+    TEST_ASSERT_EQUAL(free[2].x, 10);
+    TEST_ASSERT_EQUAL(free[2].y, 10);
+    TEST_ASSERT_EQUAL(free[3].x, 10);
+    TEST_ASSERT_EQUAL(free[3].y, 10);
+
+    free_bufs(&f);
+}

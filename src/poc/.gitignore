@@ -59,3 +59,4 @@ dkms.conf
 
 tests/run*
 main
+__pycache__

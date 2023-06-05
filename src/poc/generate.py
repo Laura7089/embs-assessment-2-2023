@@ -13,24 +13,24 @@ def colour_grid(size):
 
 def uptohalf(m, i):
     if (i * 2 < m):
-        return i + 1
+        return i
     else:
-        return m - i
+        return m - i - 1
 
 
 def diag_offsets(size):
-    for y in range(0, size + 1):
-        for x in range(0, uptohalf(size + 1, y)):
-            x *= 2
-            if (y % 2 == 0):
-                x += 1
+    size = (size * 2) - 1
+    for y in range(0, size):
+        off = uptohalf(size, y)
+        lower = (size // 2) - off
+        upper = (size // 2) + off
+        for x in range(lower, upper + 1, 2):
             yield (x, y)
 
 
-def slice_diag(grid):
-    diag_side = int(len(grid) / 2)
+def slice_diag(grid, size):
     tiles = []
-    for x, y in diag_offsets(diag_side):
+    for x, y in diag_offsets(size):
         top = grid[x][y]
         right = grid[x + 1][y]
         bottom = grid[x + 1][y + 1]
@@ -55,14 +55,11 @@ def c_literal(tiles):
         return "{{ {{ {} }}, 0 }}".format(", ".join(map(str, tile)))
 
     tile_list = "{\n\t" + ",\n\t".join(map(tlit, tiles)) + "\n}"
-    return f"tile tiles[{len(tiles)}] = {tile_list};\nunsigned int num_tiles = {len(tiles)};"
+    return f"tile TILES[{len(tiles)}] = {tile_list};\nunsigned int NTILES = {len(tiles)};"
 
 
 if __name__ == "__main__":
     puzzle_size = int(sys.argv[1])
     grid = colour_grid(puzzle_size * 2)
-
-    tiles = slice_diag(grid)
-    print("\n".join(map(human_repr, tiles)))
-
+    tiles = slice_diag(grid, puzzle_size)
     print(c_literal(tiles))

@@ -2,7 +2,7 @@
 #include <string.h>
 #include "field.h"
 
-// Get index into `f.inner` that `(x, y)` represent
+// Get index into `f.inner` that `(cs.x, cs.y)` represent
 //
 // Not part of public API
 unsigned int flatten(field* f, unsigned int x, unsigned int y) {
@@ -11,57 +11,57 @@ unsigned int flatten(field* f, unsigned int x, unsigned int y) {
 // Get a pointer to a particular index of `inner`
 //
 // This is not part of public API
-unsigned int* idxp(field* f, unsigned int x, unsigned int y) {
+unsigned int* idxp(field* f, coord cs) {
     // Column- vs row-major ordering doesn't matter here
-    return &(f->inner[flatten(f, x, y)]);
+    return &(f->inner[flatten(f, cs.x, cs.y)]);
 }
-unsigned int idx(field* f, unsigned int x, unsigned int y) {
-    return *idxp(f, x, y);
+unsigned int idx(field* f, coord cs) {
+    return *idxp(f, cs);
 }
-tile* idxt(field* f, unsigned int x, unsigned int y) {
-    return &(f->tiles[idx(f, x, y)]);
+tile* idxt(field* f, coord cs) {
+    return &(f->tiles[idx(f, cs)]);
 }
-unsigned int idxo(field* f, unsigned int x, unsigned int y, side s) {
+unsigned int idxo(field* f, coord cs, side s) {
     switch (s) {
     case bottom:
-        if (y == 0) {
+        if (cs.y == 0) {
             return f->num_tiles;
         }
-        return f->inner[flatten(f, x, y-1)];
+        return f->inner[flatten(f, cs.x, cs.y-1)];
     case top:
-        if (y >= f->size-1) {
+        if (cs.y >= f->size-1) {
             return f->num_tiles;
         }
-        return f->inner[flatten(f, x, y+1)];
+        return f->inner[flatten(f, cs.x, cs.y+1)];
     case left:
-        if (x == 0) {
+        if (cs.x == 0) {
             return f->num_tiles;
         }
-        return f->inner[flatten(f, x-1, y)];
+        return f->inner[flatten(f, cs.x-1, cs.y)];
     case right:
-        if (x == f->size-1) {
+        if (cs.x == f->size-1) {
             return f->num_tiles;
         }
-        return f->inner[flatten(f, x+1, y)];
+        return f->inner[flatten(f, cs.x+1, cs.y)];
     }
 }
 
-void place(field* f, unsigned int t, unsigned int x, unsigned int y) {
+void place(field* f, unsigned int t, coord cs) {
     if (f->placed[t]) {
         return;
     }
 
-    *idxp(f, x, y) = t;
+    *idxp(f, cs) = t;
     f->placed[t] = 1;
 }
 
-void unplace(field* f, unsigned int x, unsigned int y) {
-    unsigned int t = idx(f, x, y);
+void unplace(field* f, coord cs) {
+    unsigned int t = idx(f, cs);
     if (t == f->num_tiles) {
         return;
     }
 
-    *idxp(f, x, y) = f->num_tiles;
+    *idxp(f, cs) = f->num_tiles;
     f->placed[t] = 0;
 }
 
@@ -106,12 +106,12 @@ void free_bufs(field* f) {
     f->placed = NULL;
 }
 
-int tile_fits(field* f, unsigned int t, unsigned int x, unsigned int y) {
+int tile_fits(field* f, unsigned int t, coord cs) {
     // Figure out the sequence of colours we need
     colour invalid = 127;
     colour needed_colours[4];
     for (int s = 0; s < 4; s++) {
-        unsigned int i = idxo(f, x, y, s);
+        unsigned int i = idxo(f, cs, s);
         if (i == f->num_tiles) {
             // Location is out of bounds
             needed_colours[s] = invalid;
@@ -163,8 +163,8 @@ unsigned int num_unplaced(field* f) {
     return count;
 }
 
-int is_edge(field* f, unsigned int x, unsigned int y) {
-    return (x == 0 || x == f->size || y == 0 || y == f->size);
+int is_edge(field* f, coord cs) {
+    return (cs.x == 0 || cs.x == f->size || cs.y == 0 || cs.y == f->size);
 }
 
 void shift(field* f, side s) {
@@ -177,48 +177,48 @@ void shift(field* f, side s) {
         // Shunt up all rows
         for (int y = f->size-1; y > 0; y--) {
             for (int x = 0; x < f->size; x++) {
-                *idxp(f, x, y) = idx(f, x, y-1);
+                *idxp(f, c(x, y)) = idx(f, c(x, y-1));
             }
         }
         // "Zero out" the bottom row
         for (int x = 0; x < f->size; x++) {
-            *idxp(f, x, 0) = f->num_tiles;
+            *idxp(f, c(x, 0)) = f->num_tiles;
         }
         break;
     case bottom:
         // Shunt down all rows
         for (int y = 0; y < f->size-1; y++) {
             for (int x = 0; x < f->size; x++) {
-                *idxp(f, x, y) = idx(f, x, y+1);
+                *idxp(f, c(x, y)) = idx(f, c(x, y+1));
             }
         }
         // "Zero out" the top row
         for (int x = 0; x < f->size; x++) {
-            *idxp(f, x, f->size-1) = f->num_tiles;
+            *idxp(f, c(x, f->size-1)) = f->num_tiles;
         }
         break;
     case right:
         // Shunt right all cols
         for (int x = f->size-1; x > 0; x--) {
             for (int y = 0; y < f->size; y++) {
-                *idxp(f, x, y) = idx(f, x-1, y);
+                *idxp(f, c(x, y)) = idx(f, c(x-1, y));
             }
         }
         // "Zero out" the left col
         for (int y = 0; y < f->size; y++) {
-            *idxp(f, 0, y) = f->num_tiles;
+            *idxp(f, c(0, y)) = f->num_tiles;
         }
         break;
     case left:
         // Shunt left all cols
         for (int x = 0; x < f->size-1; x++) {
             for (int y = 0; y < f->size; y++) {
-                *idxp(f, x, y) = idx(f, x+1, y);
+                *idxp(f, c(x, y)) = idx(f, c(x+1, y));
             }
         }
         // "Zero out" the right col
         for (int y = 0; y < f->size; y++) {
-            *idxp(f, f->size-1, y) = f->num_tiles;
+            *idxp(f, c(f->size-1, y)) = f->num_tiles;
         }
         break;
     }
@@ -228,29 +228,28 @@ int touches_edge(field* f, side s) {
     switch (s) {
     case top:
         for (int x = 0; x < f->size; x++) {
-            if (idx(f, x, f->size - 1) != f->num_tiles) {
+            if (idx(f, c(x, f->size-1)) != f->num_tiles) {
                 return 1;
             }
         }
         break;
     case bottom:
         for (int x = 0; x < f->size; x++) {
-            if (idx(f, x, 0) != f->num_tiles) {
+            if (idx(f, c(x, 0)) != f->num_tiles) {
                 return 1;
             }
         }
         break;
     case right:
         for (int y = 0; y < f->size; y++) {
-            if (idx(f, f->size - 1, y) != f->num_tiles) {
+            if (idx(f, c(f->size-1, y)) != f->num_tiles) {
                 return 1;
             }
         }
         break;
-        break;
     case left:
         for (int y = 0; y < f->size; y++) {
-            if (idx(f, 0, y) != f->num_tiles) {
+            if (idx(f, c(0, y)) != f->num_tiles) {
                 return 1;
             }
         }

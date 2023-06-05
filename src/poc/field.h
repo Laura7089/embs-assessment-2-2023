@@ -17,16 +17,22 @@ typedef struct {
     unsigned int* inner;
 } field;
 
+typedef struct {
+    unsigned int x;
+    unsigned int y;
+} coord;
+#define c(x, y) (coord){ x, y }
+
 // Index into `f.inner`, get index into `f.tiles` for the tile there
 //
 // Returns `f.num_tiles` if no tile is placed there
-unsigned int idx(field* f, unsigned int x, unsigned int y);
+unsigned int idx(field* f, coord cs);
 // Index into `f.inner`, get pointer to tile there
-tile* idxt(field* f, unsigned int x, unsigned int y);
+tile* idxt(field* f, coord cs);
 // Index into `f.inner` but offset one step out from `s`
 //
 // Returns `f.num_tiles` if that cell is out of bounds
-unsigned int idxo(field* f, unsigned int x, unsigned int y, side s);
+unsigned int idxo(field* f, coord cs, side s);
 
 // Create and allocate a new `field`
 //
@@ -40,12 +46,12 @@ field copy(field* f);
 void free_bufs(field* f);
 
 // Check if a tile (index `t`) fits into `f` at `(x, y)`.
-int tile_fits(field* f, unsigned int t, unsigned int x, unsigned int y);
+int tile_fits(field* f, unsigned int t, coord cs);
 // Count how many tiles in `f` haven't been placed yet
 unsigned int num_unplaced(field* f);
 
 // Determine if an index falls on the edge of the field
-int is_edge(field* f, unsigned int x, unsigned int y);
+int is_edge(field* f, coord cs);
 // Shift all placed tiles in the direction of the given side
 //
 // This is a noop if this would push any tiles out of play
@@ -56,10 +62,17 @@ int touches_edge(field* f, side s);
 // Place tile index `t` onto the field at `(x, y)`
 //
 // If `t` is already placed, do nothing
-void place(field* f, unsigned int t, unsigned int x, unsigned int y);
+void place(field* f, unsigned int t, coord cs);
 // Remove the tile at `(x, y)` from `f`
 //
 // If there is no tile there, do nothing
-void unplace(field* f, unsigned int x, unsigned int y);
+void unplace(field* f, coord cs);
+
+// Check if all tiles are placed and the field is full
+int is_full(field* f);
+// Get all `coord`s which are empty and bordered by at least one tile
+//
+// Returns length of data written to `buf`
+unsigned int free_cells(field* f, coord* buf);
 
 #endif

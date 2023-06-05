@@ -1,3 +1,6 @@
 [submodule "src/VLAB"]
 	path = src/VLAB
 	url = https://github.com/RTSYork/VLAB
+[submodule "src/poc/tests/unity"]
+	path = src/poc/tests/unity
+	url = https://github.com/ThrowTheSwitch/Unity/

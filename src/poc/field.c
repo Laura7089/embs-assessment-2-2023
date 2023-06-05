@@ -7,7 +7,7 @@
 // This is not part of public API
 unsigned int* idxp(field* f, unsigned int x, unsigned int y) {
     // Column- vs row-major ordering doesn't matter here
-    return &(f->inner[(x * f->num_tiles) + y]);
+    return &(f->inner[(x * f->size) + y]);
 }
 unsigned int idx(field* f, unsigned int x, unsigned int y) {
     return *idxp(f, x, y);
@@ -35,16 +35,17 @@ void unplace(field* f, unsigned int x, unsigned int y) {
     f->placed[t] = 0;
 }
 
-field new_field(unsigned int num_tiles) {
+field new_field(unsigned int size) {
     field f;
-    f.num_tiles = num_tiles;
-    f.placed = calloc(num_tiles, sizeof(int));
+    f.size = size;
+    f.num_tiles = size * size;
+    f.placed = calloc(f.num_tiles, sizeof(int));
     // TODO: is there a way to `malloc` these in the same place?
-    f.tiles = malloc(sizeof(tile) * num_tiles);
-    f.inner = malloc(sizeof(unsigned int) * num_tiles * num_tiles);
+    f.tiles = malloc(sizeof(tile) * f.num_tiles);
+    f.inner = malloc(sizeof(unsigned int) * f.num_tiles);
 
-    for (int i = 0; i < (num_tiles * num_tiles); i++) {
-        f.inner[i] = num_tiles;
+    for (int i = 0; i < (f.num_tiles); i++) {
+        f.inner[i] = f.num_tiles;
     }
 
     return f;
@@ -60,8 +61,8 @@ field copy(field* f) {
     fnew.placed = malloc(sizeof(int) * f->num_tiles);
     memcpy(fnew.placed, f->placed, sizeof(int) * f->num_tiles);
 
-    fnew.inner = malloc(sizeof(unsigned int) * f->num_tiles * f->num_tiles);
-    memcpy(fnew.inner, f->inner, sizeof(unsigned int) * f->num_tiles * f->num_tiles);
+    fnew.inner = malloc(sizeof(unsigned int) * f->num_tiles);
+    memcpy(fnew.inner, f->inner, sizeof(unsigned int) * f->num_tiles);
 
     return fnew;
 }
@@ -88,7 +89,7 @@ unsigned int num_unplaced(field* f) {
 }
 
 int is_edge(field* f, unsigned int x, unsigned int y) {
-    return (x == 0 || x == f->num_tiles || y == 0 || y == f->num_tiles);
+    return (x == 0 || x == f->size || y == 0 || y == f->size);
 }
 
 void shift(field* f, side s) {
@@ -99,50 +100,50 @@ void shift(field* f, side s) {
     switch (s) {
     case top:
         // Shunt up all rows
-        for (int y = f->num_tiles-1; y > 0; y--) {
-            for (int x = 0; x < f->num_tiles; x++) {
+        for (int y = f->size-1; y > 0; y--) {
+            for (int x = 0; x < f->size; x++) {
                 *idxp(f, x, y) = idx(f, x, y-1);
             }
         }
         // "Zero out" the bottom row
-        for (int x = 0; x < f->num_tiles; x++) {
+        for (int x = 0; x < f->size; x++) {
             *idxp(f, x, 0) = f->num_tiles;
         }
         break;
     case bottom:
         // Shunt down all rows
-        for (int y = 0; y < f->num_tiles-1; y++) {
-            for (int x = 0; x < f->num_tiles; x++) {
+        for (int y = 0; y < f->size-1; y++) {
+            for (int x = 0; x < f->size; x++) {
                 *idxp(f, x, y) = idx(f, x, y+1);
             }
         }
         // "Zero out" the top row
-        for (int x = 0; x < f->num_tiles; x++) {
-            *idxp(f, x, f->num_tiles-1) = f->num_tiles;
+        for (int x = 0; x < f->size; x++) {
+            *idxp(f, x, f->size-1) = f->num_tiles;
         }
         break;
     case right:
         // Shunt right all cols
-        for (int x = f->num_tiles-1; x > 0; x--) {
-            for (int y = 0; y < f->num_tiles; y++) {
+        for (int x = f->size-1; x > 0; x--) {
+            for (int y = 0; y < f->size; y++) {
                 *idxp(f, x, y) = idx(f, x-1, y);
             }
         }
         // "Zero out" the left col
-        for (int y = 0; y < f->num_tiles; y++) {
+        for (int y = 0; y < f->size; y++) {
             *idxp(f, 0, y) = f->num_tiles;
         }
         break;
     case left:
         // Shunt left all cols
-        for (int x = 0; x < f->num_tiles-1; x++) {
-            for (int y = 0; y < f->num_tiles; y++) {
+        for (int x = 0; x < f->size-1; x++) {
+            for (int y = 0; y < f->size; y++) {
                 *idxp(f, x, y) = idx(f, x+1, y);
             }
         }
         // "Zero out" the right col
-        for (int y = 0; y < f->num_tiles; y++) {
-            *idxp(f, f->num_tiles-1, y) = f->num_tiles;
+        for (int y = 0; y < f->size; y++) {
+            *idxp(f, f->size-1, y) = f->num_tiles;
         }
         break;
     }
@@ -151,29 +152,29 @@ void shift(field* f, side s) {
 int touches_edge(field* f, side s) {
     switch (s) {
     case top:
-        for (int x = 0; x < f->num_tiles; x++) {
-            if (idx(f, x, f->num_tiles - 1) != f->num_tiles) {
+        for (int x = 0; x < f->size; x++) {
+            if (idx(f, x, f->size - 1) != f->num_tiles) {
                 return 1;
             }
         }
         break;
     case bottom:
-        for (int x = 0; x < f->num_tiles; x++) {
+        for (int x = 0; x < f->size; x++) {
             if (idx(f, x, 0) != f->num_tiles) {
                 return 1;
             }
         }
         break;
     case right:
-        for (int y = 0; y < f->num_tiles; y++) {
-            if (idx(f, f->num_tiles - 1, y) != f->num_tiles) {
+        for (int y = 0; y < f->size; y++) {
+            if (idx(f, f->size - 1, y) != f->num_tiles) {
                 return 1;
             }
         }
         break;
         break;
     case left:
-        for (int y = 0; y < f->num_tiles; y++) {
+        for (int y = 0; y < f->size; y++) {
             if (idx(f, 0, y) != f->num_tiles) {
                 return 1;
             }

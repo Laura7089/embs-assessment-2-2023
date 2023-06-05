@@ -7,6 +7,7 @@ typedef struct {
     // The tiles related to this field, placed or not
     tile* tiles;
     unsigned int num_tiles;
+    unsigned int size;
     // Whether or not the tiles have been placed (bools)
     // Used to avoid searching through `inner`
     int* placed;
@@ -26,10 +27,10 @@ tile* idxt(field* f, unsigned int x, unsigned int y);
 
 // Create and allocate a new `field`
 //
-// `num_tiles` is also the side length of the field.
+// `size` * `size` will be assumed to be the number of tiles.
 // `tiles` of the returned object is allocated but points to invalid data.
 // Caller must insert tiles as needed.
-field new_field(unsigned int num_tiles);
+field new_field(unsigned int size);
 // Get a (deep) copy of `f`
 field copy(field* f);
 // Free the buffers in `f` (but not the object itself)

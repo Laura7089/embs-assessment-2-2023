@@ -13,22 +13,33 @@ SUB_PRINT := "Submission Ready!
 "
 
 RESOURCE_LINK_FILE := "./2022_2023_resources.lnk"
+BROWSER := env_var_or_default("BROWSER", "firefox")
 
 # compile submission zip
-submission: clean report && submission_stats
+submission: clean report && stats
     mkdir -pv "{{ SUB_DIR }}"
     cp -v "{{ REPORT_DIR }}/submission.pdf" "{{ SUB_DIR }}/report.pdf"
     cp -rv "{{ PROJ_DIR }}" "{{ SUB_DIR }}"
     ouch compress "{{ SUB_DIR }}" "{{ SUB_FILE }}"
 
 # print stats for the submission file
-submission_stats:
-    @echo
-    @echo "{{ SUB_PRINT }}"
+stats:
+    #!/bin/bash
+    set -euo pipefail
+    if [ ! -f "{{ SUB_FILE }}" ]; then
+        echo "No submission file found, try 'just submission'"
+        exit 1
+    else
+        echo "{{ SUB_PRINT }}"
+    fi
 
 # open the EMBS wiki
-wiki browser="firefox":
+wiki browser=BROWSER:
     "{{ browser }}" $(cat "{{ RESOURCE_LINK_FILE }}")
+
+# open the assessment rubric
+rubric viewer="okular":
+    "{{ viewer }}" rubric.pdf &
 
 [private]
 report:

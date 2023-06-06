@@ -2,6 +2,7 @@
 #include "unity.h"
 #include "../field.h"
 #include "../tile.h"
+#include "../solve.h"
 
 // Rubric image example
 // lilac = 0

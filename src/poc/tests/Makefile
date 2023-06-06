@@ -1,5 +1,5 @@
 UNITY := unity/src
-SOURCES := ../field.c ../tile.c
+SOURCES := ../field.c ../tile.c ../solve.c
 
 CC := gcc
 CFLAGS := -I${UNITY} -O0 -g

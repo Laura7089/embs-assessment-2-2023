@@ -41,7 +41,7 @@ unsigned int idxo(field* f, coord cs, side s);
 // Caller must insert tiles as needed.
 field new_field(unsigned int size);
 // Get a (deep) copy of `f`
-field copy(field* f);
+field fcopy(field* f);
 // Free the buffers in `f` (but not the object itself)
 void free_bufs(field* f);
 
@@ -89,8 +89,8 @@ unsigned int free_cells(field* f, coord* buf);
 // Find a solution to the puzzle.
 //
 // Expects at least one tile to be placed.
-// If it finds a solution, mutates `f` and writes a `1` to `solved`.
-// If not, `solved` is set to `0` and the final state of `f` is unknown.
-void solve(field* f, int* solved);
+// If it finds a solution, mutates `f` and returns 1;
+// If not, return 0 and the final state of `f` is unknown.
+int solve(field* f);
 
 #endif

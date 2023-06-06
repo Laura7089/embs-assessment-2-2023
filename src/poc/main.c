@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "tile.h"
 #include "field.h"
+#include "solve.h"
 
 tile RUBRIC_TILES[] = {
     {{ 0, 1, 2, 0 }, 0},

@@ -86,11 +86,4 @@ int is_full(field* f);
 // Returns length of data written to `buf`
 unsigned int free_cells(field* f, coord* buf);
 
-// Find a solution to the puzzle.
-//
-// Expects at least one tile to be placed.
-// If it finds a solution, mutates `f` and returns 1;
-// If not, return 0 and the final state of `f` is unknown.
-int solve(field* f);
-
 #endif

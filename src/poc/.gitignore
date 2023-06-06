@@ -61,3 +61,4 @@ tests/run*
 main
 __pycache__
 known_solvable
+main_debug

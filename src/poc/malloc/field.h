@@ -1,7 +1,7 @@
 #ifndef FIELD
 #define FIELD
 
-#include "tile.h"
+#include "../tile.h"
 
 typedef struct {
     // The tiles related to this field, placed or not

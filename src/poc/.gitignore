@@ -58,7 +58,6 @@ dkms.conf
 # End of https://www.toptal.com/developers/gitignore/api/c
 
 tests/run*
-main
+main*
 __pycache__
 known_solvable
-main_debug

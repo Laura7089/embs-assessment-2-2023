@@ -299,15 +299,13 @@ unsigned int repr_field(char* buf, field* f) {
         }
     }
 
-    unsigned int bytes_written = 0;
     // Width (which we want) of one side of tile repr
     int TR_WIDTH = 3;
-    size_t BYTES_PER_LOOP = sizeof(char) * TR_WIDTH;
+    int num_rows = f->size * TR_WIDTH;
+    int row_width = num_rows + 1;
+    unsigned int buf_len = num_rows * row_width;
 
-    int num_columns = f->size * TR_WIDTH;
-    int row_width = num_columns + 1;
-
-    for (int y = 0; y < num_columns; y++) {
+    for (int y = 0; y < num_rows; y++) {
         int start_of_row = y * row_width;
         // Row offset into tile repr
         // We add one to skip the newlines
@@ -320,19 +318,17 @@ unsigned int repr_field(char* buf, field* f) {
             int bi = start_of_row + (tile_x * TR_WIDTH);
 
             // Copy characters into `buf`
-            memcpy(&buf[bi], &this_tile[tri], BYTES_PER_LOOP);
-            bytes_written += BYTES_PER_LOOP;
+            memcpy(&buf[bi], &this_tile[tri], 3);
         }
 
-        if (y != num_columns-1) {
+        if (y != num_rows-1) {
             buf[start_of_row + row_width - 1] = '\n';
         } else {
             buf[start_of_row + row_width - 1] = '\0';
         }
-        bytes_written += sizeof(char);
     }
 
-    return bytes_written;
+    return buf_len;
 }
 
 void print_field(field* f) {

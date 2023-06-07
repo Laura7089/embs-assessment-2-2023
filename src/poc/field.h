@@ -24,8 +24,8 @@ unsigned int idxo(field* f, coord cs, side s);
 // Create/allocate a new `field`
 //
 // `size * size` will be assumed to be the number of tiles.
-// `tiles` is assumed to be of the correct length (`size * size`).
-field new_field(unsigned int size, tile* tiles);
+// `tiles` is ready to be filled with the puzzle tiles.
+field new_field(unsigned int size);
 // Get a (deep) copy of `f`
 field fcopy(field* f);
 // Free the buffers in `f` (but not the object itself)

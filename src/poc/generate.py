@@ -1,5 +1,6 @@
 #!/bin/env python3
 
+import math
 import random
 import sys
 
@@ -58,7 +59,8 @@ def c_literal(tiles):
     return f"""#include "tile.h"
 
 tile TILES[{len(tiles)}] = {tile_list};
-unsigned int NTILES = {len(tiles)};"""
+unsigned int NTILES = {len(tiles)};
+unsigned int NTILESROOT = {int(math.sqrt(len(tiles)))};"""
 
 
 if __name__ == "__main__":

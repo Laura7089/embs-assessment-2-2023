@@ -3,17 +3,16 @@
 #include "field_def.h"
 #include "../field.h"
 
-field new_field(unsigned int size, tile* tiles) {
+field new_field(unsigned int size) {
     field f;
     f.size = size;
     f.num_tiles = size * size;
     f.placed = calloc(f.num_tiles, sizeof(int));
     // TODO: is there a way to `malloc` these in the same place?
     f.tiles = malloc(sizeof(tile) * f.num_tiles);
-    memcpy(f.tiles, tiles, sizeof(tile) * f.num_tiles);
     f.inner = malloc(sizeof(unsigned int) * f.num_tiles);
 
-    for (int i = 0; i < (f.num_tiles); i++) {
+    for (int i = 0; i < f.num_tiles; i++) {
         f.inner[i] = f.num_tiles;
     }
 

@@ -19,7 +19,8 @@ BROWSER := env_var_or_default("BROWSER", "firefox")
 submission: clean report && stats
     mkdir -pv "{{ SUB_DIR }}"
     cp -v "{{ REPORT_DIR }}/submission.pdf" "{{ SUB_DIR }}/report.pdf"
-    cp -rv "{{ PROJ_DIR }}" "{{ SUB_DIR }}"
+    cp -rv "{{ PROJ_DIR }}/viv_project" "{{ SUB_DIR }}"
+    cp -rv "{{ PROJ_DIR }}/vitis" "{{ SUB_DIR }}"
     ouch compress "{{ SUB_DIR }}" "{{ SUB_FILE }}"
 
 # print stats for the submission file

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="ASCII"?>
 <sdkproject:SdkProject xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sdkproject="http://www.xilinx.com/sdkproject" name="embs_assessment" location="/home/userfs/e/erdd501/w2k/source/embs/embs-assessment-2-2203/src/vitis/embs_assessment" platform="/home/userfs/e/erdd501/w2k/source/embs/embs-assessment-2-2203/src/vitis/design_1_wrapper/export/design_1_wrapper/design_1_wrapper.xpfm" platformUID="xilinx:zybo-z7-10::0.0(custom)" systemProject="embs_assessment_system" sysConfig="design_1_wrapper" runtime="cpp" cpu="standalone_ps7_cortexa9_0" cpuInstance="ps7_cortexa9_0" os="standalone" mssSignature="f07e196fb64f4b0fd701ad02d37c6e0a">
-  <configuration name="Debug" id="xilinx.gnu.armv7.exe.debug.1013130622" dirty="true">
+  <configuration name="Debug" id="xilinx.gnu.armv7.exe.debug.1013130622">
     <configBuildOptions xsi:type="sdkproject:SdkOptions"/>
+    <lastBuildOptions xsi:type="sdkproject:SdkOptions"/>
   </configuration>
   <configuration name="Release" id="xilinx.gnu.armv7.exe.release.788159975" dirty="true">
     <configBuildOptions xsi:type="sdkproject:SdkOptions"/>

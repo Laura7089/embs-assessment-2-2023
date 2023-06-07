@@ -21,6 +21,10 @@ int main(int argc, char** argv) {
     int solved = solve(&f);
     printf("Solution found: %d\n", solved);
 
+    char buff[1000];
+    repr_field(buff, &f);
+    printf("%s\n", buff);
+
     free_bufs(&f);
     return 0;
 }

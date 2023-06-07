@@ -59,3 +59,14 @@ side opposite(side s) {
         return right;
     }
 }
+
+void repr_tile(char* buf, tile t) {
+    sprintf(
+        buf,
+        " %d \n%d %d\n %d ",
+        get_side(t, top),
+        get_side(t, left),
+        get_side(t, right),
+        get_side(t, bottom)
+    );
+}

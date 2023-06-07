@@ -72,4 +72,10 @@ int is_full(field* f);
 // Returns length of data written to `buf`
 unsigned int free_cells(field* f, coord* buf);
 
+// Write a string representation of `f` to `buf`
+//
+// Returns how many characters were written.
+// This value is expected to be `(f.num_tiles * 9) + f.size`.
+unsigned int repr_field(char* buf, field* f);
+
 #endif

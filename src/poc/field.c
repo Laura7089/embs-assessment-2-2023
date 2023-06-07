@@ -273,3 +273,58 @@ int try_place_any(field* f, coord cs) {
 
     return 0;
 }
+
+unsigned int repr_field(char* buf, field* f) {
+    char tile_reprs[f->num_tiles][12];
+
+    char EMPTY[12] = "eee\neee\neee";
+
+    // First get representations of all the tiles
+    for (int x = 0; x < f->size; x++) {
+        for (int y = 0; y < f->size; y++) {
+            unsigned int t = idx(f, c(x, y));
+            // Index into tile_reprs that we want
+            unsigned int tri = flatten(f, x, y);
+            if (t == f->num_tiles) {
+                // If there's no tile there
+                memcpy(&tile_reprs[tri], &EMPTY, 12 * sizeof(char));
+                continue;
+            }
+            repr_tile(&tile_reprs[tri][0], f->tiles[t]);
+        }
+    }
+
+    unsigned int bytes_written = 0;
+    // Width (which we want) of one side of tile repr
+    int TR_WIDTH = 3;
+
+    int num_rows = f->size * 3;
+    int num_columns = f->size * TR_WIDTH;
+    int row_width = num_columns + 1;
+
+    for (int y = 0; y < num_columns; y++) {
+        int tile_y = y / 3;
+        int yi = y % 3;
+        int start_of_row = y * row_width;
+        // Index into tile repr to start at correct row of it
+        int tri = yi * (TR_WIDTH + 1);
+
+        for (int tile_x = 0; tile_x < f->size; tile_x++) {
+            // Start index into `buf`
+            unsigned int bi = start_of_row + (tile_x * TR_WIDTH);
+            // Tile index into `tile_reprs`
+            unsigned int ti = flatten(f, tile_x, tile_y);
+
+            // Copy three characters into `buf`
+            memcpy(&buf[bi], &tile_reprs[ti][tri], sizeof(char) * TR_WIDTH);
+            bytes_written += TR_WIDTH;
+        }
+
+        if (y != f->size-1) {
+            buf[start_of_row + row_width - 1] = '\n';
+            bytes_written += 1;
+        }
+    }
+
+    return bytes_written;
+}

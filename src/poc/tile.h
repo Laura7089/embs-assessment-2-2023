@@ -9,6 +9,7 @@ typedef struct {
 } tile;
 
 typedef enum {
+    // this must always start at 0 for logic in other places to work
     top = 0,
     right = 1,
     bottom = 2,
@@ -39,5 +40,11 @@ void print_tile(tile t);
 
 // Get the opposite `side` to `s`
 side opposite(side s);
+
+// Write a representation of `t`, with rotation, to `buf`
+//
+// Always writes exactly 12 characters to buf.
+// Does not write a final newline.
+void repr_tile(char* buf, tile t);
 
 #endif

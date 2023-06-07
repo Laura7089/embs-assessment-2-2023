@@ -296,28 +296,26 @@ unsigned int repr_field(char* buf, field* f) {
     unsigned int bytes_written = 0;
     // Width (which we want) of one side of tile repr
     int TR_WIDTH = 3;
+    size_t BYTES_PER_LOOP = sizeof(char) * TR_WIDTH;
 
-    int num_rows = f->size * 3;
     int num_columns = f->size * TR_WIDTH;
     int row_width = num_columns + 1;
 
     for (int y = 0; y < num_columns; y++) {
-        int tile_y = y / 3;
-        int yi = y % 3;
         int start_of_row = y * row_width;
-        // Index into tile repr to start at correct row of it
-        int tri = yi * (TR_WIDTH + 1);
+        // Row offset into tile repr
+        // We add one to skip the newlines
+        int tri = (y % TR_WIDTH) * (TR_WIDTH + 1);
 
+        int tile_y = y / TR_WIDTH;
         for (int tile_x = 0; tile_x < f->size; tile_x++) {
+            char* this_tile = &tile_reprs[flatten(f, tile_x, tile_y)][0];
             // Start index into `buf`
-            unsigned int bi = start_of_row + (tile_x * TR_WIDTH);
-            // Tile index into `tile_reprs`
-            unsigned int ti = flatten(f, tile_x, tile_y);
+            int bi = start_of_row + (tile_x * TR_WIDTH);
 
             // Copy characters into `buf`
-            size_t num_to_write = sizeof(char) * TR_WIDTH;
-            memcpy(&buf[bi], &tile_reprs[ti][tri], num_to_write);
-            bytes_written += num_to_write;
+            memcpy(&buf[bi], &this_tile[tri], BYTES_PER_LOOP);
+            bytes_written += BYTES_PER_LOOP;
         }
 
         if (y != num_columns-1) {

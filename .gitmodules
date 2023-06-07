@@ -4,3 +4,6 @@
 [submodule "src/poc/tests/unity"]
 	path = src/poc/tests/unity
 	url = https://github.com/ThrowTheSwitch/Unity/
+[submodule "src/zybo-z7-hdmi"]
+	path = src/zybo-z7-hdmi
+	url = https://github.com/RTSYork/zybo-z7-hdmi.git

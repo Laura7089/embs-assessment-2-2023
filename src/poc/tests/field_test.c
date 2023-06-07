@@ -140,3 +140,31 @@ void test_free_spaces(void) {
 
     free_bufs(&f);
 }
+
+void test_repr(void) {
+    field f = new_field(2);
+
+    char buf[1000];
+    int written = repr_field(buf, &f);
+    TEST_ASSERT_EQUAL(42, written);
+    TEST_ASSERT_EQUAL_CHAR_ARRAY(
+        "eeeeee\neeeeee\neeeeee\neeeeee\neeeeee\neeeeee",
+        buf,
+        written
+    );
+
+    for (int i = 0; i < 4; i++) {
+        f.inner[i] = i;
+        f.placed[i] = 1;
+    }
+
+    char buf2[1000];
+    int written2 = repr_field(buf2, &f);
+    TEST_ASSERT_EQUAL(42, written2);
+    printf("%s\n", buf2);
+    TEST_ASSERT_EQUAL_CHAR_ARRAY(
+        " 0  0 \n 0 15 3\n 2  4 \n 0  3 \n 3 42 4\n 0  5 ",
+        buf2,
+        written2
+    );
+}

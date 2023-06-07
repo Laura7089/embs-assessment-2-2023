@@ -326,5 +326,6 @@ unsigned int repr_field(char* buf, field* f) {
         }
     }
 
-    return bytes_written;
+    buf[bytes_written] = '\0';
+    return bytes_written + 1;
 }

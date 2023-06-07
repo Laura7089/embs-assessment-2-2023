@@ -17,4 +17,4 @@ test_%.c: %.c
 	./unity/auto/generate_test_runner.rb $^ $@
 
 clean:
-	rm -fv run_*
+	rm -fv test_*

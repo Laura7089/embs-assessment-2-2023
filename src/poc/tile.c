@@ -10,6 +10,9 @@ void rotate_left(tile* t) {
     t->rotation += 1;
 }
 void rotate_right(tile* t) {
+    if (t->rotation == 0) {
+        t->rotation = 4;
+    }
     t->rotation -= 1;
 }
 

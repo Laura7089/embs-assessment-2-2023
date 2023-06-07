@@ -31,6 +31,11 @@ field fcopy(field* f);
 // Free the buffers in `f` (but not the object itself)
 void free_bufs(field* f);
 
+// Write the 4 colours surrounding `cs` in `f` to `buf`.
+//
+// `top` first.
+// If an adjacent space is unoccupied or out of bounds, write `127` for that space.
+void sur_colours(field* f, colour* buf, coord cs);
 // Check if a tile (index `t`) fits into `f` at `(x, y)`.
 //
 // If it does fit, this function will also rotate it appropriately.

@@ -128,7 +128,9 @@ void test_fits(void) {
     // Test fits in tile (0, 1)
     // Tile 3 doesn't fit, the other two do
     TEST_ASSERT(tile_fits(&f, 1, c(0, 1)));
+    TEST_ASSERT_EQUAL(0, f.tiles[1].rotation);
     TEST_ASSERT(tile_fits(&f, 2, c(0, 1)));
+    TEST_ASSERT_EQUAL(2, f.tiles[2].rotation);
     TEST_ASSERT(!tile_fits(&f, 3, c(0, 1)));
     // Test fits in tile (1, 0)
     // None can fit because none have blue
@@ -138,8 +140,11 @@ void test_fits(void) {
     // Test fits in tile (1, 1)
     // All should fit because nothing borders this space
     TEST_ASSERT(tile_fits(&f, 1, c(1, 1)));
+    TEST_ASSERT_EQUAL(0, f.tiles[1].rotation);
     TEST_ASSERT(tile_fits(&f, 2, c(1, 1)));
+    TEST_ASSERT_EQUAL(2, f.tiles[2].rotation);
     TEST_ASSERT(tile_fits(&f, 3, c(1, 1)));
+    TEST_ASSERT_EQUAL(0, f.tiles[3].rotation);
 
     free_bufs(&f);
 }
@@ -161,6 +166,19 @@ void test_free_spaces(void) {
     TEST_ASSERT_EQUAL(free[2].y, 10);
     TEST_ASSERT_EQUAL(free[3].x, 10);
     TEST_ASSERT_EQUAL(free[3].y, 10);
+
+    free_bufs(&f);
+}
+
+void test_sur_colours(void) {
+    field f = get_rubric_example_placed_asis();
+    unplace(&f, c(1, 1));
+
+    colour ncols[4];
+    sur_colours(&f, ncols, c(1, 1));
+
+    colour expected[] = {127, 127, 3, 1};
+    TEST_ASSERT_EQUAL_CHAR_ARRAY(expected, ncols, 4);
 
     free_bufs(&f);
 }

@@ -66,27 +66,32 @@ void unplace(field* f, coord cs) {
     f->placed[t] = 0;
 }
 
-int tile_fits(field* f, unsigned int t, coord cs) {
-    // Figure out the sequence of colours we need
-    colour invalid = 127;
-    colour needed_colours[4];
+const colour INVALID = 127;
+
+void sur_colours(field* f, colour* buf, coord cs) {
     for (int s = 0; s < 4; s++) {
         unsigned int i = idxo(f, cs, s);
         if (i == f->num_tiles) {
             // Location is out of bounds
-            needed_colours[s] = invalid;
+            buf[s] = INVALID;
             continue;
         }
 
         unsigned int adj = f->inner[i];
         if (adj == f->num_tiles) {
             // No tile is placed there ergo anything will fit
-            needed_colours[s] = invalid;
+            buf[s] = INVALID;
             continue;
         }
 
-        needed_colours[s] = get_side(f->tiles[adj], opposite(s));
+        buf[s] = get_side(f->tiles[adj], opposite(s));
     }
+}
+
+int tile_fits(field* f, unsigned int t, coord cs) {
+    // Figure out the sequence of colours we need
+    colour needed_colours[4];
+    sur_colours(f, needed_colours, cs);
 
     tile* ti = &f->tiles[t];
     // Try matching the colours to the file in 4 different rotations
@@ -94,7 +99,7 @@ int tile_fits(field* f, unsigned int t, coord cs) {
     for (int _r = 0; _r < 4; _r++) {
         int fits = 1;
         for (int s = 0; s < 4; s++) {
-            if (needed_colours[s] == invalid) {
+            if (needed_colours[s] == INVALID) {
                 continue;
             } else if (get_side(*ti, s) != needed_colours[s]) {
                 fits = 0;

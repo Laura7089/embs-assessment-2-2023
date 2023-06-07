@@ -18,15 +18,6 @@ int matches(tile base, tile other, side s) {
     return (get_side(base, s) == get_side(other, side_of_other));
 }
 
-void print_tile(tile t) {
-    printf( "[%u, %u, %u, %u]",
-            get_side(t, top),
-            get_side(t, right),
-            get_side(t, bottom),
-            get_side(t, left)
-          );
-}
-
 int has_cseq(tile t, colour* colours, unsigned int num_colours) {
     // Start from each side
     for (int s = 0; s < 4; s++) {
@@ -51,10 +42,10 @@ side opposite(side s) {
     switch (s) {
     case top:
         return bottom;
-    case right:
-        return left;
     case bottom:
         return top;
+    case right:
+        return left;
     case left:
         return right;
     }
@@ -69,4 +60,10 @@ void repr_tile(char* buf, tile t) {
         get_side(t, right),
         get_side(t, bottom)
     );
+}
+
+void print_tile(tile t) {
+    char buf[12];
+    repr_tile(buf, t);
+    printf("%s\n", buf);
 }

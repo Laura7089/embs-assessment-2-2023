@@ -77,5 +77,9 @@ unsigned int free_cells(field* f, coord* buf);
 // Returns how many characters were written.
 // This value is expected to be `(f.num_tiles * 9) + (3 * f.size`).
 unsigned int repr_field(char* buf, field* f);
+// Print the output of `repr_field` to stdout.
+//
+// Writes a trailing newline.
+void print_field(field* f);
 
 #endif

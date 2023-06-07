@@ -11,7 +11,7 @@ tile RUBRIC_TILES[] = {
     {{ 3, 4, 5, 2 }, 0},
 };
 
-#include "./puzzles/size4_2.h"
+#include "./puzzles/size3_2.h"
 
 int main(int argc, char** argv) {
     field f = new_field(NTILESROOT);
@@ -19,11 +19,17 @@ int main(int argc, char** argv) {
     place(&f, 0, c(0, 0)); // Place a tile to get it started
 
     int solved = solve(&f);
-    printf("Solution found: %d\n", solved);
+    if (!solved) {
+        return 1;
+    }
 
-    char buff[1000];
-    repr_field(buff, &f);
-    printf("%s\n", buff);
+    printf("Solution found:\n");
+    print_field(&f);
+
+    for (int i = 0; i < 3; i++) {
+        printf("\nTile at (%d, %d):\n", i, i);
+        print_tile(*idxt(&f, c(i, i)));
+    }
 
     free_bufs(&f);
     return 0;

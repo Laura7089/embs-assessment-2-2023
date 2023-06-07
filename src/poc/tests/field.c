@@ -26,8 +26,32 @@ field get_rubric_example(void) {
     return f;
 }
 
+field get_rubric_example_placed_asis(void) {
+    field f = get_rubric_example();
+    for (int i = 0; i < 4; i++) {
+        f.inner[i] = i;
+        f.placed[i] = 1;
+    }
+    return f;
+}
+
 void test_create(void) {
     field f = get_rubric_example();
+    free_bufs(&f);
+}
+
+void test_idxo(void) {
+    field f = get_rubric_example_placed_asis();
+    TEST_ASSERT_EQUAL(idxo(&f, c(0, 0), top), 1);
+    TEST_ASSERT_EQUAL(idxo(&f, c(0, 0), right), 2);
+    TEST_ASSERT_EQUAL(idxo(&f, c(0, 0), bottom), 4);
+    TEST_ASSERT_EQUAL(idxo(&f, c(0, 0), left), 4);
+
+    TEST_ASSERT_EQUAL(idxo(&f, c(1, 0), top), 3);
+    TEST_ASSERT_EQUAL(idxo(&f, c(1, 0), right), 4);
+    TEST_ASSERT_EQUAL(idxo(&f, c(1, 0), bottom), 4);
+    TEST_ASSERT_EQUAL(idxo(&f, c(1, 0), left), 0);
+
     free_bufs(&f);
 }
 
@@ -141,6 +165,19 @@ void test_free_spaces(void) {
     free_bufs(&f);
 }
 
+void test_try_place(void) {
+    field f = get_rubric_example();
+    rotate_right(&f.tiles[3]);
+    rotate_right(&f.tiles[3]);
+    place(&f, 3, c(0, 0));
+
+    TEST_ASSERT(try_place(&f, 2, c(0, 1)));
+    TEST_ASSERT_EQUAL(2, idx(&f, c(0, 1)));
+    TEST_ASSERT_EQUAL(3, f.tiles[2].rotation);
+
+    free_bufs(&f);
+}
+
 void test_repr_empty(void) {
     field f = new_field(2);
 
@@ -157,12 +194,7 @@ void test_repr_empty(void) {
 }
 
 void test_repr_filled(void) {
-    field f = get_rubric_example();
-
-    for (int i = 0; i < 4; i++) {
-        f.inner[i] = i;
-        f.placed[i] = 1;
-    }
+    field f = get_rubric_example_placed_asis();
 
     char buf[1000];
     int written = repr_field(buf, &f);

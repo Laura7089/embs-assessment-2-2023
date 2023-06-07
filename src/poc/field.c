@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include "field.h"
 
 // Get index into `f.inner` that `(cs.x, cs.y)` represent
@@ -327,4 +328,10 @@ unsigned int repr_field(char* buf, field* f) {
     }
 
     return bytes_written;
+}
+
+void print_field(field* f) {
+    char buf[(f->num_tiles * 9) + (f->size * 3)];
+    repr_field(buf, f);
+    printf("%s\n", buf);
 }

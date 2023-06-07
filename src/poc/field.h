@@ -1,21 +1,8 @@
 #ifndef FIELD
 #define FIELD
 
-#include "../tile.h"
-
-typedef struct {
-    // The tiles related to this field, placed or not
-    tile* tiles;
-    unsigned int num_tiles;
-    unsigned int size;
-    // Whether or not the tiles have been placed (bools)
-    // Used to avoid searching through `inner`
-    int* placed;
-    // The actual field - values are indexes into `tiles`
-    //
-    // We indicate an empty space by setting it to `f.num_tiles`
-    unsigned int* inner;
-} field;
+#include "tile.h"
+#include "field_def.h"
 
 typedef struct {
     unsigned int x;
@@ -34,12 +21,11 @@ tile* idxt(field* f, coord cs);
 // Returns `f.num_tiles` if that cell is out of bounds
 unsigned int idxo(field* f, coord cs, side s);
 
-// Create and allocate a new `field`
+// Create/allocate a new `field`
 //
-// `size` * `size` will be assumed to be the number of tiles.
-// `tiles` of the returned object is allocated but points to invalid data.
-// Caller must insert tiles as needed.
-field new_field(unsigned int size);
+// `size * size` will be assumed to be the number of tiles.
+// `tiles` is assumed to be of the correct length (`size * size`).
+field new_field(unsigned int size, tile* tiles);
 // Get a (deep) copy of `f`
 field fcopy(field* f);
 // Free the buffers in `f` (but not the object itself)

@@ -14,8 +14,7 @@ tile RUBRIC_TILES[] = {
 
 int main(int argc, char** argv) {
 
-    field f = new_field(NTILES);
-    f.tiles = TILES;
+    field f = new_field(NTILES, TILES);
     place(&f, 0, c(0, 0)); // Place a tile to get it started
 
     int solved = solve(&f);

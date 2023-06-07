@@ -65,25 +65,6 @@ void unplace(field* f, coord cs) {
     f->placed[t] = 0;
 }
 
-field new_field(unsigned int size) {
-    field f;
-    f.size = size;
-    f.num_tiles = size * size;
-
-    for (int i = 0; i < (f.num_tiles); i++) {
-        f.inner[i] = f.num_tiles;
-        f.placed[i] = 0;
-    }
-
-    return f;
-}
-
-field fcopy(field* f) {
-    return *f;
-}
-
-void free_bufs(field* f) {}
-
 int tile_fits(field* f, unsigned int t, coord cs) {
     // Figure out the sequence of colours we need
     colour invalid = 127;

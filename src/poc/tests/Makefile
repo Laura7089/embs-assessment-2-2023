@@ -10,10 +10,10 @@ METHOD := heapless
 
 .PHONY: clean
 
-run_%: %.c run_%.c ${SOURCES} ${UNITY}/unity.c ../${METHOD}/field_def.c
+test_%: %.c test_%.c ${SOURCES} ${UNITY}/unity.c ../${METHOD}/field_def.c
 	${CC} ${CFLAGS} -I../${METHOD} $^ -o $@
 
-run_%.c: %.c
+test_%.c: %.c
 	./unity/auto/generate_test_runner.rb $^ $@
 
 clean:

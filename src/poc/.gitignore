@@ -57,7 +57,7 @@ dkms.conf
 
 # End of https://www.toptal.com/developers/gitignore/api/c
 
-tests/run*
+tests/test*
 main*
 __pycache__
 puzzles

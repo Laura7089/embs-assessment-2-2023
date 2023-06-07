@@ -274,10 +274,9 @@ int try_place_any(field* f, coord cs) {
     return 0;
 }
 
+const char EMPTY[12] = "eee\neee\neee";
 unsigned int repr_field(char* buf, field* f) {
     char tile_reprs[f->num_tiles][12];
-
-    char EMPTY[12] = "eee\neee\neee";
 
     // First get representations of all the tiles
     for (int x = 0; x < f->size; x++) {
@@ -287,7 +286,7 @@ unsigned int repr_field(char* buf, field* f) {
             unsigned int tri = flatten(f, x, y);
             if (t == f->num_tiles) {
                 // If there's no tile there
-                memcpy(&tile_reprs[tri], &EMPTY, 12 * sizeof(char));
+                memcpy(&tile_reprs[tri][0], &EMPTY, 12 * sizeof(char));
                 continue;
             }
             repr_tile(&tile_reprs[tri][0], f->tiles[t]);
@@ -315,17 +314,19 @@ unsigned int repr_field(char* buf, field* f) {
             // Tile index into `tile_reprs`
             unsigned int ti = flatten(f, tile_x, tile_y);
 
-            // Copy three characters into `buf`
-            memcpy(&buf[bi], &tile_reprs[ti][tri], sizeof(char) * TR_WIDTH);
-            bytes_written += TR_WIDTH;
+            // Copy characters into `buf`
+            size_t num_to_write = sizeof(char) * TR_WIDTH;
+            memcpy(&buf[bi], &tile_reprs[ti][tri], num_to_write);
+            bytes_written += num_to_write;
         }
 
-        if (y != f->size-1) {
+        if (y != num_columns-1) {
             buf[start_of_row + row_width - 1] = '\n';
-            bytes_written += 1;
+        } else {
+            buf[start_of_row + row_width - 1] = '\0';
         }
+        bytes_written += sizeof(char);
     }
 
-    buf[bytes_written] = '\0';
-    return bytes_written + 1;
+    return bytes_written;
 }

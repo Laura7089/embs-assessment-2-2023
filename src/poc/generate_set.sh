@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euxo pipefail
 
-OUT_DIR=${1:-known_solvable}
+OUT_DIR=${1:-puzzles}
 GENERATOR=${2:-./generate.py}
 
 mkdir -p "$OUT_DIR"

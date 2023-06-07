@@ -10,7 +10,7 @@ tile RUBRIC_TILES[] = {
     {{ 3, 4, 5, 2 }, 0},
 };
 
-#include "./known_solvable/size3_0.h"
+#include "./puzzles/size3_0.h"
 
 int main(int argc, char** argv) {
 

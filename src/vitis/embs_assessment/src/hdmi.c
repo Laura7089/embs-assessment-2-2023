@@ -108,7 +108,7 @@ void show_field_hdmi(field* f) {
 	Xil_DCacheFlush();
 
 	for (int tile_y = f->size-1; tile_y >= 0; tile_y--) {
-		int num_lines = (f->size - 1 - tile_y) * TILE_SIDE;
+		int num_lines = (f->size - 1 - tile_y) * (TILE_SIDE + 1);
 		int buf_offset = num_lines * stride;
 
 		// Top Row
@@ -132,6 +132,8 @@ void show_field_hdmi(field* f) {
 					// Do nothing if the tile isn't placed, leave the space black
 					this_row_off += TILE_SIDE;
 				}
+				frame[this_row_off] = 0;
+				this_row_off += 1;
 			}
 			buf_offset += stride;
 		}
@@ -147,8 +149,8 @@ void show_field_hdmi(field* f) {
 					write_colour_row(&frame[this_row_off], cl);
 					this_row_off += COLOUR_SIDE;
 
-					// Blank
-					write_colour_row(&frame[this_row_off], 0);
+					// White square in centre to increase visibility
+					write_colour_row(&frame[this_row_off], 0x00ffffff);
 					this_row_off += COLOUR_SIDE;
 
 					write_colour_row(&frame[this_row_off], cr);
@@ -157,6 +159,8 @@ void show_field_hdmi(field* f) {
 					// Do nothing if the tile isn't placed, leave the space black
 					this_row_off += TILE_SIDE;
 				}
+				frame[this_row_off] = 0;
+				this_row_off += 1;
 			}
 			buf_offset += stride;
 		}
@@ -181,9 +185,17 @@ void show_field_hdmi(field* f) {
 					// Do nothing if the tile isn't placed, leave the space black
 					this_row_off += TILE_SIDE;
 				}
+				frame[this_row_off] = 0;
+				this_row_off += 1;
 			}
 			buf_offset += stride;
 		}
+
+		// Write a black row
+		for (int x = 0; x < stride; x++) {
+			frame[buf_offset + x] = 0;
+		}
+		buf_offset += stride;
 	}
 
 	Xil_DCacheFlush();

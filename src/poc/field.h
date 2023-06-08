@@ -87,6 +87,10 @@ int is_full(field* f);
 //
 // Returns length of data written to `buf`
 unsigned int free_cells(field* f, coord* buf);
+// Get all `coords` which are empty and bordered on side `border`
+//
+// Returns length of data written to `buf`
+unsigned int free_cells_dir(field* f, coord* buf, side border);
 
 // Write a string representation of `f` to `buf`
 //

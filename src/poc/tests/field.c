@@ -168,6 +168,18 @@ void test_free_spaces(void) {
     TEST_ASSERT_EQUAL(free[3].y, 10);
 }
 
+void test_free_cells_dir(void) {
+    field f = get_rubric_example();
+    place(&f, 0, c(0, 0));
+
+    coord free[4];
+    unsigned int num_free = free_cells_dir(&f, free, bottom);
+
+    TEST_ASSERT_EQUAL(num_free, 1);
+    TEST_ASSERT_EQUAL(free[0].x, 0);
+    TEST_ASSERT_EQUAL(free[0].y, 1);
+}
+
 void test_sur_colours(void) {
     {
         field f = get_rubric_example_placed_asis();

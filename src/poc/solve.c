@@ -16,10 +16,9 @@ void solve_inner(field* f, field* solved, int* num_solved) {
         solved[*num_solved] = fcopy(f);
         if (try_place_any(&solved[*num_solved], frees[0])) {
             *num_solved += 1;
-            if (*num_solved == MAX_SOLVED) {
-                return;
-            }
         }
+        // Return immediately because there's no point recursing here
+        return;
     }
 
     // Recursive case(s)
@@ -50,8 +49,10 @@ void solve_inner(field* f, field* solved, int* num_solved) {
 
         // Try to place a tile
         // We have to try to place one otherwise the `solve` calls will keep shifting back and forth
+        // Only need to check bottom-left tiles since those are the
+        // only ones we can have freed by shifting top or right
         coord frees[fs.num_tiles / 2];
-        unsigned int num_free = free_cells(&fs, frees);
+        unsigned int num_free = free_cells_dir(&fs, frees, d);
         for (int i = 0; i < num_free; i++) {
             // Make another copy
             field fsp = fcopy(&fs);

@@ -1,7 +1,7 @@
 // Copyright 1986-2021 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2020.2.2 (lin64) Build 3118627 Tue Feb  9 05:13:49 MST 2021
-// Date        : Wed Jun  7 13:40:59 2023
+// Date        : Thu Jun  8 10:41:05 2023
 // Host        : cse169pc69 running 64-bit Ubuntu 22.04.2 LTS
 // Command     : write_verilog -force -mode funcsim
 //               /home/userfs/e/erdd501/w2k/source/embs/embs-assessment-2-2203/src/viv_project/embs_assessment.gen/sources_1/bd/design_1/ip/design_1_rgb2dvi_0_0/design_1_rgb2dvi_0_0_sim_netlist.v

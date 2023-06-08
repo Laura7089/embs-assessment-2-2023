@@ -1,7 +1,7 @@
 Copyright 1986-2021 Xilinx, Inc. All Rights Reserved.
 -----------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2020.2.2 (lin64) Build 3118627 Tue Feb  9 05:13:49 MST 2021
-| Date         : Wed Jun  7 13:49:07 2023
+| Date         : Thu Jun  8 12:29:58 2023
 | Host         : cse169pc69 running 64-bit Ubuntu 22.04.2 LTS
 | Command      : report_utilization -file design_1_wrapper_utilization_placed.rpt -pb design_1_wrapper_utilization_placed.pb
 | Design       : design_1_wrapper
@@ -58,8 +58,8 @@ Table of Contents
 | 0     |          Yes |           - |            - |
 | 13    |          Yes |           - |          Set |
 | 23    |          Yes |           - |        Reset |
-| 299   |          Yes |         Set |            - |
-| 5434  |          Yes |       Reset |            - |
+| 319   |          Yes |         Set |            - |
+| 5414  |          Yes |       Reset |            - |
 +-------+--------------+-------------+--------------+
 
 
@@ -185,13 +185,13 @@ Table of Contents
 +------------+------+----------------------+
 |  Ref Name  | Used |  Functional Category |
 +------------+------+----------------------+
-| FDRE       | 5434 |         Flop & Latch |
+| FDRE       | 5414 |         Flop & Latch |
 | LUT6       | 1003 |                  LUT |
 | LUT5       |  792 |                  LUT |
 | LUT3       |  785 |                  LUT |
 | LUT2       |  449 |                  LUT |
 | LUT4       |  433 |                  LUT |
-| FDSE       |  299 |         Flop & Latch |
+| FDSE       |  319 |         Flop & Latch |
 | MUXF7      |  176 |                MuxFx |
 | CARRY4     |  160 |           CarryLogic |
 | SRL16E     |  130 |   Distributed Memory |

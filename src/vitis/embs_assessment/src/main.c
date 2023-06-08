@@ -25,7 +25,7 @@ void udp_get_handler(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_ad
 
 int main()
 {
-	unsigned char mac_ethernet_address[] = {0x00, 0x11, 0x22, 0x33, 0x00, 0x26};
+	unsigned char mac_ethernet_address[] = {0x00, 0x11, 0x22, 0x33, 0x00, 0x26}; // Put your own MAC address here!
 	init_platform(mac_ethernet_address, NULL, NULL);
 
 //	struct udp_pcb *recv_pcb = udp_new();
@@ -60,7 +60,6 @@ int main()
 //	while (1) {
 //		handle_ethernet();
 //	}
-//	return 0;
 
     print("Hello World\n\r");
     print("Successfully ran Hello World application");

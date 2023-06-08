@@ -1,3 +1,8 @@
 .env
 *.vlabkey
 .nfs*
+*.log
+*_pid*
+NA
+vivado*.jou
+.Xil

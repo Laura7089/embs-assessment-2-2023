@@ -18,25 +18,25 @@ preplace inst ps7_0_axi_periph -pg 1 -lvl 2 -x 550 -y 210 -defaultsOSRD
 preplace inst rst_ps7_0_100M -pg 1 -lvl 1 -x 210 -y 530 -defaultsOSRD
 preplace inst axi_gpio_0 -pg 1 -lvl 4 -x 1250 -y 430 -defaultsOSRD
 preplace inst axi_gpio_1 -pg 1 -lvl 4 -x 1250 -y 570 -defaultsOSRD
-preplace netloc processing_system7_0_FCLK_CLK0 1 0 5 20 410 390 410 710 300 1030 340 1480
-preplace netloc processing_system7_0_FCLK_RESET0_N 1 0 5 30 430 NJ 430 NJ 430 1020J 350 1470
-preplace netloc rst_ps7_0_100M_peripheral_aresetn 1 1 3 400 420 720 440 1010
-preplace netloc hdmi_hdmi_out 1 3 2 1000J 120 NJ
-preplace netloc processing_system7_0_M_AXI_GP0 1 1 4 390 10 NJ 10 NJ 10 1480
+preplace netloc processing_system7_0_FCLK_CLK0 1 0 5 20 410 380 410 700 300 1020 340 1460
+preplace netloc processing_system7_0_FCLK_RESET0_N 1 0 5 30 430 NJ 430 NJ 430 1010J 350 1450
+preplace netloc rst_ps7_0_100M_peripheral_aresetn 1 1 3 390 420 710 440 1000
+preplace netloc hdmi_hdmi_out 1 3 2 990J 120 NJ
+preplace netloc processing_system7_0_M_AXI_GP0 1 1 4 380 10 NJ 10 NJ 10 1460
 preplace netloc ps7_0_axi_periph_M00_AXI 1 2 1 N 170
 preplace netloc ps7_0_axi_periph_M01_AXI 1 2 1 N 190
 preplace netloc ps7_0_axi_periph_M02_AXI 1 2 1 N 210
 preplace netloc hdmi_M00_AXI 1 3 1 N 220
+preplace netloc axi_gpio_0_GPIO2 1 4 1 NJ 440
+preplace netloc ps7_0_axi_periph_M03_AXI 1 2 2 690J 110 1000
+preplace netloc axi_gpio_0_GPIO 1 4 1 NJ 420
 preplace netloc processing_system7_0_DDR 1 4 1 NJ 180
 preplace netloc processing_system7_0_FIXED_IO 1 4 1 NJ 200
-preplace netloc axi_gpio_0_GPIO 1 4 1 NJ 420
-preplace netloc axi_gpio_0_GPIO2 1 4 1 NJ 440
-preplace netloc ps7_0_axi_periph_M03_AXI 1 2 2 700J 110 1010
-preplace netloc axi_gpio_1_GPIO 1 4 1 NJ 560
 preplace netloc axi_gpio_1_GPIO2 1 4 1 NJ 580
-preplace netloc ps7_0_axi_periph_M04_AXI 1 2 2 700 550 NJ
+preplace netloc ps7_0_axi_periph_M04_AXI 1 2 2 690 550 NJ
+preplace netloc axi_gpio_1_GPIO 1 4 1 NJ 560
 levelinfo -pg 1 0 210 550 860 1250 1500
-pagesize -pg 1 -db -bbox -sgen 0 0 1630 650
+pagesize -pg 1 -db -bbox -sgen 0 0 1620 650
 "
 }
 {

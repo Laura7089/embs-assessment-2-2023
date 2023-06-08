@@ -11,6 +11,8 @@ TESTS=(
     "tile"
 )
 
+cd "$(dirname "$0")" || exit 1
+
 for method in "${METHODS[@]}"; do
     echo "Testing with $method"
     for testname in "${TESTS[@]}"; do

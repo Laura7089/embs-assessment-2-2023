@@ -29,6 +29,10 @@ DisplayCtrl dispCtrl; // Display driver struct
 u32 frameBuf[DISPLAY_NUM_FRAMES][MAX_FRAME] __attribute__((aligned(0x20))); // Frame buffers for video data
 void *pFrames[DISPLAY_NUM_FRAMES]; // Array of pointers to the frame buffers
 
+void hdmi_setup(void);
+
+void show_field_hdmi(field* f);
+
 void hdmi_setup(void) {
 	// Initialise an array of pointers to the 2 frame buffers
 	int i;

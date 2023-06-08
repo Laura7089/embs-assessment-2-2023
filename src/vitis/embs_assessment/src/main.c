@@ -140,6 +140,9 @@ int main()
 	// Set up the receive handler
 	udp_recv(recv_pcb, udp_get_handler, NULL);
 
+	printf("Running HDMI gradient example...");
+	show_field_hdmi((field*) NULL);
+
 	printf("Setup Complete\n\n");
 
 	struct udp_pcb *send_pcb = udp_new();

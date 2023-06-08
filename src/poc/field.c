@@ -282,53 +282,42 @@ int try_place_any(field* f, coord cs) {
 
 const char EMPTY[12] = "eee\neee\neee";
 unsigned int repr_field(char* buf, field* f) {
-    char tile_reprs[f->num_tiles][12];
+    int buf_size = (f->num_tiles * 9) + (f->size * 3);
+    int row_width = (f->size * 3) + 1;
 
-    // First get representations of all the tiles
-    for (int x = 0; x < f->size; x++) {
-        for (int y = 0; y < f->size; y++) {
-            unsigned int t = idx(f, c(x, y));
-            // Index into tile_reprs that we want
-            unsigned int tri = flatten(f, x, y);
-            if (t == f->num_tiles) {
-                // If there's no tile there
-                memcpy(&tile_reprs[tri][0], &EMPTY, 12 * sizeof(char));
-                continue;
-            }
-            repr_tile(&tile_reprs[tri][0], f->tiles[t]);
+    // Iterate top-down so the origin is in the bottom left
+    int buf_offset = 0;
+    for (int tile_y = f->size-1; tile_y >= 0; tile_y--) {
+        // Top row
+        for (int tile_xt = 0; tile_xt < f->size; tile_xt++) {
+            tile t = *idxt(f, c(tile_xt, tile_y));
+            sprintf(&buf[buf_offset], " %d ", get_side(t, top));
+            buf_offset += 3;
         }
+        sprintf(&buf[buf_offset], "\n");
+        buf_offset += 1;
+        // Middle row
+        for (int tile_xm = 0; tile_xm < f->size; tile_xm++) {
+            tile t = *idxt(f, c(tile_xm, tile_y));
+            sprintf(&buf[buf_offset], "%d %d", get_side(t, left), get_side(t, right));
+            buf_offset += 3;
+        }
+        sprintf(&buf[buf_offset], "\n");
+        buf_offset += 1;
+        // Bottom row
+        for (int tile_xb = 0; tile_xb < f->size; tile_xb++) {
+            tile t = *idxt(f, c(tile_xb, tile_y));
+            sprintf(&buf[buf_offset], " %d ", get_side(t, bottom));
+            buf_offset += 3;
+        }
+
+        if (tile_y != 0) {
+            sprintf(&buf[buf_offset], "\n");
+        }
+        buf_offset += 1;
     }
 
-    // Width (which we want) of one side of tile repr
-    int TR_WIDTH = 3;
-    int num_rows = f->size * TR_WIDTH;
-    int row_width = num_rows + 1;
-    unsigned int buf_len = num_rows * row_width;
-
-    for (int y = 0; y < num_rows; y++) {
-        int start_of_row = y * row_width;
-        // Row offset into tile repr
-        // We add one to skip the newlines
-        int tri = (y % TR_WIDTH) * (TR_WIDTH + 1);
-
-        int tile_y = y / TR_WIDTH;
-        for (int tile_x = 0; tile_x < f->size; tile_x++) {
-            char* this_tile = &tile_reprs[flatten(f, tile_x, tile_y)][0];
-            // Start index into `buf`
-            int bi = start_of_row + (tile_x * TR_WIDTH);
-
-            // Copy characters into `buf`
-            memcpy(&buf[bi], &this_tile[tri], 3);
-        }
-
-        if (y != num_rows-1) {
-            buf[start_of_row + row_width - 1] = '\n';
-        } else {
-            buf[start_of_row + row_width - 1] = '\0';
-        }
-    }
-
-    return buf_len;
+    return buf_size;
 }
 
 void print_field(field* f) {

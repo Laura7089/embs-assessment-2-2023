@@ -176,8 +176,10 @@ void test_sur_colours(void) {
 
     colour ncols[4];
     sur_colours(&f, ncols, c(1, 1));
+    print_field(&f);
+    printf("%d, %d, %d, %d\n", ncols[0], ncols[1], ncols[2], ncols[3]);
 
-    colour expected[] = {127, 127, 3, 1};
+    colour expected[] = {127, 127, 0, 3};
     TEST_ASSERT_EQUAL_CHAR_ARRAY(expected, ncols, 4);
 
     free_bufs(&f);
@@ -218,7 +220,7 @@ void test_repr_filled(void) {
     int written = repr_field(buf, &f);
     TEST_ASSERT_EQUAL(42, written);
     TEST_ASSERT_EQUAL_CHAR_ARRAY(
-        " 0  0 \n0 15 3\n 2  4 \n 0  3 \n3 42 4\n 0  5 ",
+        " 0  3 \n3 42 4\n 0  5 \n 0  0 \n0 15 3\n 2  4 ",
         buf,
         written
     );

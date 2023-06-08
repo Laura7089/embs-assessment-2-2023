@@ -136,7 +136,7 @@ int main()
     scanf("%2s", choice);
 
     if (choice[0] == '2') {
-    	printf("HDMI static mode selected.");
+    	printf("HDMI static mode selected\n");
 
     	const tile SAMPLE_TILES[16] = {
 			{{3, 1, 4, 6}, 0},
@@ -148,12 +148,12 @@ int main()
 			{{7, 1, 2, 5}, 0},
 			{{2, 3, 7, 1}, 0},
 			{{5, 1, 9, 4}, 0},
-			{{6, 1, 6, 5}, 0},
+			{{6, 1, 5, 6}, 0},
 			{{9, 3, 6, 1}, 0},
 			{{1, 2, 9, 3}, 0},
 			{{6, 7, 2, 1}, 0},
 			{{5, 8, 6, 1}, 0},
-			{{5, 2, 5, 2}, 0},
+			{{5, 2, 5, 3}, 0},
 			{{4, 5, 5, 2}, 0}
     	};
 
@@ -165,6 +165,8 @@ int main()
     		sample.inner[i] = i;
     	}
 
+    	printf("Printing this pre-solved field to HDMI:\n");
+    	print_field(&sample);
     	show_field_hdmi(&sample);
 
     	while (1) {}

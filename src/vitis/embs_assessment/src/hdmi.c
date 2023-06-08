@@ -118,13 +118,15 @@ void show_field_hdmi(field* f) {
 				int t = idx(f, c(tile_xt, tile_y));
 				if (t != f->num_tiles) {
 					int colour = colour_mapping[get_side(f->tiles[t], top)];
-					// Skip blank
+					// Blank
+					write_colour_row(&frame[this_row_off], 0);
 					this_row_off += COLOUR_SIDE;
 
 					write_colour_row(&frame[this_row_off], colour);
 					this_row_off += COLOUR_SIDE;
 
-					// Skip blank again
+					// Blank
+					write_colour_row(&frame[this_row_off], 0);
 					this_row_off += COLOUR_SIDE;
 				} else {
 					// Do nothing if the tile isn't placed, leave the space black
@@ -145,7 +147,8 @@ void show_field_hdmi(field* f) {
 					write_colour_row(&frame[this_row_off], cl);
 					this_row_off += COLOUR_SIDE;
 
-					// Skip blank
+					// Blank
+					write_colour_row(&frame[this_row_off], 0);
 					this_row_off += COLOUR_SIDE;
 
 					write_colour_row(&frame[this_row_off], cr);
@@ -164,13 +167,15 @@ void show_field_hdmi(field* f) {
 				int t = idx(f, c(tile_xt, tile_y));
 				if (t != f->num_tiles) {
 					int colour = colour_mapping[get_side(f->tiles[t], bottom)];
-					// Skip blank
+					// Blank
+					write_colour_row(&frame[this_row_off], 0);
 					this_row_off += COLOUR_SIDE;
 
 					write_colour_row(&frame[this_row_off], colour);
 					this_row_off += COLOUR_SIDE;
 
-					// Skip blank again
+					// Blank
+					write_colour_row(&frame[this_row_off], 0);
 					this_row_off += COLOUR_SIDE;
 				} else {
 					// Do nothing if the tile isn't placed, leave the space black

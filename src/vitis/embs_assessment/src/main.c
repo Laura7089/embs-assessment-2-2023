@@ -22,7 +22,7 @@ void bytes_from_seed(char* buf, uint32_t seed) {
 	}
 }
 
-void make_puzzle_req(char* buf) {
+void make_and_send_puzzle_req(struct udp_pcb *send_pcb) {
 	// Assemble the request
 	printf("Enter puzzle size");
 	char size;
@@ -31,15 +31,11 @@ void make_puzzle_req(char* buf) {
 	uint32_t seed;
 	scanf("%lu", &seed);
 
-	buf[0] = 1;
-	buf[1] = size;
-	bytes_from_seed(&buf[2], seed);
-}
-
-void make_and_send_puzzle_req(struct udp_pcb *send_pcb) {
-	// Send a request for the puzzle
 	char request_msg[6];
-	make_puzzle_req(request_msg);
+	request_msg[0] = 1;
+	request_msg[1] = size;
+	bytes_from_seed(&request_msg[2], seed);
+
 	// Create a packet buffer and set the payload as the message
 	printf("Sending [%d, %d, %d, %d, %d, %d]\n", request_msg[0], request_msg[1], request_msg[2], request_msg[3], request_msg[4], request_msg[5]);
     struct pbuf * request = pbuf_alloc(PBUF_TRANSPORT, 6, PBUF_REF);
@@ -47,6 +43,33 @@ void make_and_send_puzzle_req(struct udp_pcb *send_pcb) {
 	// Send the message
 	udp_sendto(send_pcb, request, &PUZZLE_SERVER_IP, PUZZLE_SERVER_PORT);
 	pbuf_free(request);
+}
+
+void browse_solutions(field* fields, int num_fields) {
+	int cur_field = 0;
+	char next_instr[2] = " ";
+
+	while (1) {
+		switch (next_instr[0]) {
+		case 'n':
+			cur_field = (cur_field + 1) % num_fields;
+			break;
+		case 'p':
+			if (cur_field == 0) {
+				cur_field = num_fields;
+			}
+			cur_field -= 1;
+			break;
+		case 'q':
+			return;
+		}
+		printf("\nSolution %d:\n", cur_field + 1);
+		print_field(&fields[cur_field]);
+		printf("\n");
+
+		printf("What would you like to do next? [(p)revious, (n)ext, (q)uit]");
+		scanf("%2s", next_instr);
+	}
 }
 
 void udp_get_handler(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_addr_t *addr, u16_t port) {
@@ -60,7 +83,7 @@ void udp_get_handler(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_ad
         printf("Header: [%d, %d, %d, %d, %d, %d]\n", header[0], header[1], header[2], header[3], header[4], header[5]);
         unsigned char size = header[1];
         uint32_t seed = seed_from_bytes(&header[2]);
-        printf("Header spec: size=%d\n", size);
+        printf("Header spec: size=%d, seed=%ld\n", size, seed);
 
         unsigned int tile_bytes = size * size * 4;
         char body[tile_bytes];
@@ -84,7 +107,7 @@ void udp_get_handler(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_ad
         if (!solve(&f)) {
         	printf("Couldn't find any solutions, I tried this start:\n");
         } else {
-        	printf("Found a solution:\n");
+        	browse_solutions(&f, 1);
         }
         print_field(&f);
 
@@ -103,9 +126,10 @@ int main()
 {
 	IP4_ADDR(&PUZZLE_SERVER_IP, 192, 168, 10, 1);
 
-    print("\n\n\n\n================================================================\n\rHello World\n\r");
+    print("\n\n\n\n================================================================\n\r");
 
 	init_platform(MAC_ADDR, NULL, NULL);
+	hdmi_setup();
 
 	struct udp_pcb *recv_pcb = udp_new();
 	if (!recv_pcb) {
@@ -115,6 +139,8 @@ int main()
 	udp_bind(recv_pcb, IP_ADDR_ANY, PUZZLE_SERVER_PORT);
 	// Set up the receive handler
 	udp_recv(recv_pcb, udp_get_handler, NULL);
+
+	printf("Setup Complete\n\n");
 
 	struct udp_pcb *send_pcb = udp_new();
 	make_and_send_puzzle_req(send_pcb);

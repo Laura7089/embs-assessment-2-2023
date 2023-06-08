@@ -172,15 +172,17 @@ void test_free_spaces(void) {
 
 void test_sur_colours(void) {
     field f = get_rubric_example_placed_asis();
-    unplace(&f, c(1, 1));
-
     colour ncols[4];
-    sur_colours(&f, ncols, c(1, 1));
-    print_field(&f);
-    printf("%d, %d, %d, %d\n", ncols[0], ncols[1], ncols[2], ncols[3]);
 
-    colour expected[] = {127, 127, 0, 3};
+    unplace(&f, c(1, 1));
+    sur_colours(&f, ncols, c(1, 1));
+    colour expected[] = {127, 127, 0, 4};
     TEST_ASSERT_EQUAL_CHAR_ARRAY(expected, ncols, 4);
+
+    unplace(&f, c(0, 0));
+    sur_colours(&f, ncols, c(0, 0));
+    colour expected2[] = {0, 5, 127, 127};
+    TEST_ASSERT_EQUAL_CHAR_ARRAY(expected2, ncols, 4);
 
     free_bufs(&f);
 }

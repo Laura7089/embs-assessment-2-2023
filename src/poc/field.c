@@ -290,24 +290,37 @@ unsigned int repr_field(char* buf, field* f) {
     for (int tile_y = f->size-1; tile_y >= 0; tile_y--) {
         // Top row
         for (int tile_xt = 0; tile_xt < f->size; tile_xt++) {
-            tile t = *idxt(f, c(tile_xt, tile_y));
-            sprintf(&buf[buf_offset], " %d ", get_side(t, top));
+            int t = idx(f, c(tile_xt, tile_y));
+            if (t != f->num_tiles) {
+                sprintf(&buf[buf_offset], " %d ", get_side(f->tiles[t], top));
+            } else {
+                sprintf(&buf[buf_offset], "eee");
+            }
             buf_offset += 3;
         }
         sprintf(&buf[buf_offset], "\n");
         buf_offset += 1;
         // Middle row
         for (int tile_xm = 0; tile_xm < f->size; tile_xm++) {
-            tile t = *idxt(f, c(tile_xm, tile_y));
-            sprintf(&buf[buf_offset], "%d %d", get_side(t, left), get_side(t, right));
+            int t = idx(f, c(tile_xm, tile_y));
+            if (t != f->num_tiles) {
+                tile ti = f->tiles[t];
+                sprintf(&buf[buf_offset], "%d %d", get_side(ti, left), get_side(ti, right));
+            } else {
+                sprintf(&buf[buf_offset], "eee");
+            }
             buf_offset += 3;
         }
         sprintf(&buf[buf_offset], "\n");
         buf_offset += 1;
         // Bottom row
         for (int tile_xb = 0; tile_xb < f->size; tile_xb++) {
-            tile t = *idxt(f, c(tile_xb, tile_y));
-            sprintf(&buf[buf_offset], " %d ", get_side(t, bottom));
+            int t = idx(f, c(tile_xb, tile_y));
+            if (t != f->num_tiles) {
+                sprintf(&buf[buf_offset], " %d ", get_side(f->tiles[t], bottom));
+            } else {
+                sprintf(&buf[buf_offset], "eee");
+            }
             buf_offset += 3;
         }
 

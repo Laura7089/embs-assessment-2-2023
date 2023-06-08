@@ -5,29 +5,38 @@ BIN_NAME := "main"
 SVG_VIEWER := env_var_or_default("BROWSER", "firefox")
 FLAME_OUT := `mktemp --tmpdir -u embs_poc_flameXXXX.svg`
 RAND_EPOCH := `echo $(($RANDOM % 10))`
+DEBUG_CFLAGS := "'CFLAGS=-g -O0'"
+[private]
+js recipe *args:
+    just BIN_NAME={{ BIN_NAME }}_single {{ recipe }} {{ args }}
 
 run size epoch=RAND_EPOCH: (build size epoch)
     time ./{{ BIN_NAME }}
 alias r := run
+run_single size epoch=RAND_EPOCH: (js "run" size epoch)
+alias rs := run_single
 
 build size epoch=RAND_EPOCH *args="":
     make SIZE={{ size }} EPOCH={{ epoch }} {{ args }} {{ BIN_NAME }}
+build_single size epoch=RAND_EPOCH *args="": (js "build" size epoch args)
 
-debug debugger="gdb" *args="": (build "'CFLAGS=-g -O0'")
+debug size epoch=RAND_EPOCH debugger="gdb" *args="": (build size epoch DEBUG_CFLAGS)
     "{{ debugger }}" {{ args }} {{ BIN_NAME }}
 alias d := debug
+debug_single size epoch=RAND_EPOCH debugger="gdb" *args="": (js "debug" size epoch debugger args)
 
 test:
     "{{ TEST_DIR }}/run_all.sh"
 alias t := test
 
-bench size *args="": (build size)
+bench size epoch=RAND_EPOCH *args="": (build size epoch)
     hyperfine \
         -N \
         {{ args }} \
         -- \
         ./{{ BIN_NAME }}
 alias b := bench
+bench_single size epoch=RAND_EPOCH *args="": (js "bench" size epoch args)
 
 flame size output=FLAME_OUT *args="": (build size RAND_EPOCH)
     time flamegraph \
@@ -36,9 +45,11 @@ flame size output=FLAME_OUT *args="": (build size RAND_EPOCH)
         -- \
         ./{{ BIN_NAME }}
     "{{ SVG_VIEWER }}" "{{ output }}"
+flame_single size output=FLAME_OUT *args="": (js "flame" size output args)
 
 clean:
-    rm -fv {{ BIN_NAME }}
+    rm -fv {{ BIN_NAME }}*
+    rm -fv {{ BIN_NAME }}_single*
     rm -fv "{{ TEST_DIR }}/test_*"
     rm -fv perf.*
 alias c := clean

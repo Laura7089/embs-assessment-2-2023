@@ -11,11 +11,11 @@ tile RUBRIC_TILES[] = {
     {{ 3, 4, 5, 2 }, 0},
 };
 
-#include "./puzzles/size3_2.h"
+#include "./puzzles/size3_6.h"
 
 int main(int argc, char** argv) {
-    field f = new_field(2);
-    memcpy(f.tiles, RUBRIC_TILES, 4 * sizeof(tile));
+    field f = new_field(NTILESROOT);
+    memcpy(f.tiles, TILES, NTILES * sizeof(tile));
     /* memcpy(f.tiles, TILES, NTILES * sizeof(tile)); */
     place(&f, 0, c(0, 0)); // Place a tile to get it started
 
@@ -26,11 +26,6 @@ int main(int argc, char** argv) {
 
     printf("Solution found:\n");
     print_field(&f);
-
-    for (int i = 0; i < 2; i++) {
-        printf("\nTile at (%d, %d):\n", i, i);
-        print_tile(*idxt(&f, c(i, i)));
-    }
 
     free_bufs(&f);
     return 0;

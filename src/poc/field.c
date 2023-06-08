@@ -77,14 +77,13 @@ void sur_colours(field* f, colour* buf, coord cs) {
             continue;
         }
 
-        unsigned int adj = f->inner[i];
-        if (adj == f->num_tiles) {
+        if (i == f->num_tiles) {
             // No tile is placed there ergo anything will fit
             buf[s] = INVALID;
             continue;
         }
 
-        buf[s] = get_side(f->tiles[adj], opposite(s));
+        buf[s] = get_side(f->tiles[i], opposite(s));
     }
 }
 

@@ -146,7 +146,16 @@ void test_fits(void) {
     TEST_ASSERT(tile_fits(&f, 3, c(1, 1)));
     TEST_ASSERT_EQUAL(0, f.tiles[3].rotation);
 
+    field f2 = get_rubric_example();
+    rotate_right(&f2.tiles[3]);
+    rotate_right(&f2.tiles[3]);
+    place(&f2, 3, c(0, 0));
+    print_field(&f2);
+    TEST_ASSERT(tile_fits(&f, 2, c(0, 1)));
+    TEST_ASSERT_EQUAL(3, f.tiles[2].rotation);
+
     free_bufs(&f);
+    free_bufs(&f2);
 }
 
 void test_free_spaces(void) {
@@ -171,20 +180,48 @@ void test_free_spaces(void) {
 }
 
 void test_sur_colours(void) {
-    field f = get_rubric_example_placed_asis();
-    colour ncols[4];
+    {
+        field f = get_rubric_example_placed_asis();
+        colour ncols[4];
 
-    unplace(&f, c(1, 1));
-    sur_colours(&f, ncols, c(1, 1));
-    colour expected[] = {127, 127, 0, 4};
-    TEST_ASSERT_EQUAL_CHAR_ARRAY(expected, ncols, 4);
+        unplace(&f, c(1, 1));
+        sur_colours(&f, ncols, c(1, 1));
+        colour expected[] = {127, 127, 0, 4};
+        TEST_ASSERT_EQUAL_CHAR_ARRAY(expected, ncols, 4);
 
-    unplace(&f, c(0, 0));
-    sur_colours(&f, ncols, c(0, 0));
-    colour expected2[] = {0, 5, 127, 127};
-    TEST_ASSERT_EQUAL_CHAR_ARRAY(expected2, ncols, 4);
+        free_bufs(&f);
+    }
 
-    free_bufs(&f);
+    {
+        field f = get_rubric_example_placed_asis();
+        colour ncols[4];
+
+        unplace(&f, c(0, 0));
+        sur_colours(&f, ncols, c(0, 0));
+        colour expected[] = {0, 5, 127, 127};
+        TEST_ASSERT_EQUAL_CHAR_ARRAY(expected, ncols, 4);
+
+        free_bufs(&f);
+    }
+
+    {
+        field f = get_rubric_example();
+        rotate_right(&f.tiles[3]);
+        rotate_right(&f.tiles[3]);
+        place(&f, 3, c(0, 0));
+
+        colour ncols[4];
+        sur_colours(&f, ncols, c(0, 1));
+        colour expected[] = {127, 127, 5, 127};
+        TEST_ASSERT_EQUAL_CHAR_ARRAY(expected, ncols, 4);
+
+        colour ncols2[4];
+        sur_colours(&f, ncols2, c(1, 0));
+        colour expected2[] = {127, 127, 127, 2};
+        TEST_ASSERT_EQUAL_CHAR_ARRAY(expected2, ncols2, 4);
+
+        free_bufs(&f);
+    }
 }
 
 void test_try_place(void) {
@@ -192,8 +229,11 @@ void test_try_place(void) {
     rotate_right(&f.tiles[3]);
     rotate_right(&f.tiles[3]);
     place(&f, 3, c(0, 0));
+    print_field(&f);
 
     TEST_ASSERT(try_place(&f, 2, c(0, 1)));
+    printf("\n");
+    print_field(&f);
     TEST_ASSERT_EQUAL(2, idx(&f, c(0, 1)));
     TEST_ASSERT_EQUAL(3, f.tiles[2].rotation);
 

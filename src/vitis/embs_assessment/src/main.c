@@ -141,7 +141,7 @@ int main()
 	udp_recv(recv_pcb, udp_get_handler, NULL);
 
 	printf("Running HDMI gradient example...");
-	show_field_hdmi((field*) NULL);
+	show_gradient();
 
 	printf("Setup Complete\n\n");
 

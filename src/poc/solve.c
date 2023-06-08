@@ -30,8 +30,8 @@ coord next_free(field* f) {
     return c(f->size, f->size);
 }
 
-void solve_inner(field* f, field* solved, int* num_solved) {
-    if (*num_solved == MAX_SOLVED) {
+void solve_inner(field* f, field* solved, int* num_solved, int max) {
+    if (*num_solved == max) {
         return;
     }
 
@@ -61,8 +61,8 @@ void solve_inner(field* f, field* solved, int* num_solved) {
         for (int t = 0; t < f->num_tiles; t++) {
             field fs = fcopy(f);
             if (try_place(&fs, t, nf)) {
-                solve_inner(&fs, solved, num_solved);
-                if (*num_solved == MAX_SOLVED) {
+                solve_inner(&fs, solved, num_solved, max);
+                if (*num_solved == max) {
                     return;
                 }
             }
@@ -91,8 +91,8 @@ void solve_inner(field* f, field* solved, int* num_solved) {
         // Try to place something
         for (int t = 0; t < fs.num_tiles; t++) {
             if (try_place(&fs, t, nf)) {
-                solve_inner(&fs, solved, num_solved);
-                if (*num_solved == MAX_SOLVED) {
+                solve_inner(&fs, solved, num_solved, max);
+                if (*num_solved == max) {
                     return;
                 }
             }
@@ -107,6 +107,15 @@ int solve(field* solved, field* f) {
     field fi = fcopy(f);
 
     int num_solved = 0;
-    solve_inner(&fi, solved, &num_solved);
+    solve_inner(&fi, solved, &num_solved, MAX_SOLVED);
     return num_solved;
+}
+
+field solve_to_first(field* f) {
+    field fi = fcopy(f);
+
+    field solved;
+    int num_solved = 0;
+    solve_inner(&fi, &solved, &num_solved, 1);
+    return solved;
 }

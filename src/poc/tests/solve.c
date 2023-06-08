@@ -30,7 +30,8 @@ field get_rubric_example(void) {
 void test_solve_rubric(void) {
     field f = get_rubric_example();
 
-    int solved = solve(&f);
+    field solved[MAX_SOLVED];
+    int num_solved = solve(solved, &f);
 
     TEST_ASSERT(solved);
 

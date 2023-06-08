@@ -17,16 +17,19 @@ int main(int argc, char** argv) {
     field f = new_field(NTILESROOT);
     memcpy(f.tiles, TILES, NTILES * sizeof(tile));
     /* memcpy(f.tiles, TILES, NTILES * sizeof(tile)); */
-    place(&f, 0, c(0, 0)); // Place a tile to get it started
 
-    int solved = solve(&f);
-    if (!solved) {
+    field solved[MAX_SOLVED];
+    int num_solved = solve(solved, &f);
+    if (!num_solved) {
         return 1;
     }
 
     printf("Solution found:\n");
-    print_field(&f);
+    print_field(&solved[0]);
 
     free_bufs(&f);
+    for (int i = 0; i < num_solved; i++) {
+        free_bufs(&solved[i]);
+    }
     return 0;
 }

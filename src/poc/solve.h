@@ -1,8 +1,9 @@
 #include "field.h"
 
+#define MAX_SOLVED 8
+
 // Find a solution to the puzzle.
 //
-// Expects at least one tile to be placed.
-// If it finds a solution, mutates `f` and returns 1;
-// If not, return 0 and the final state of `f` is unknown.
-int solve(field* f);
+// Writes solved fields to `solved`, returns number written.
+// If no solutions, noop and return 0.
+int solve(field* solved, field* f);

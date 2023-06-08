@@ -15,104 +15,97 @@ int already_solved(field* f, field* solved, int num_solved) {
     return 0;
 }
 
+// Get the next cell that should be filled
+//
+// If the grid is filled, returns an oob coord
+coord next_free(field* f) {
+    for (int x = 0; x < f->size; x++) {
+        for (int y = 0; y < f->size; y++) {
+            coord cs = c(x, y);
+            if (idx(f, cs) == f->num_tiles) {
+                return cs;
+            }
+        }
+    }
+    return c(f->size, f->size);
+}
+
 void solve_inner(field* f, field* solved, int* num_solved) {
     if (*num_solved == MAX_SOLVED) {
         return;
     }
 
-    // printf("Solve called with:\n");
-    // print_field(f);
+    /* printf("Solve called with:\n"); */
+    /* print_field(f); */
 
     {
-        coord frees[f->num_tiles / 2];
-        unsigned int num_free = free_cells(f, frees);
+        coord nf = next_free(f);
+        /* printf("Next free spot: (%d, %d)\n", nf.x, nf.y); */
 
         // Base case
-        if (num_free == 1) {
+        if (num_unplaced(f) == 1) {
             solved[*num_solved] = fcopy(f);
-            if (try_place_any(&solved[*num_solved], frees[0])) {
+            if (try_place_any(&solved[*num_solved], nf)) {
                 if (!already_solved(&solved[*num_solved], solved, *num_solved)) {
-                    // printf("Base case found:\n");
-                    // print_field(&solved[*num_solved]);
+                    /* printf("Base case found:\n"); */
+                    /* print_field(&solved[*num_solved]); */
                     *num_solved += 1;
                 }
             }
             // Return immediately because there's no point recursing here
+            /* printf("Returning, there's nothing to do\n"); */
             return;
         }
 
         // Recursive Case 1: plain ol' placing
-        for (int i = 0; i < num_free; i++) {
+        for (int t = 0; t < f->num_tiles; t++) {
             field fs = fcopy(f);
-            if (try_place_any(&fs, frees[i])) {
+            if (try_place(&fs, t, nf)) {
                 solve_inner(&fs, solved, num_solved);
                 if (*num_solved == MAX_SOLVED) {
                     return;
                 }
             }
         }
-        // printf("Recursive cases run on %d possible squares\n", num_free);
+    }
+
+    // No shift if the field is empty.
+    if (num_unplaced(f) == f->num_tiles) {
+        /* printf("Skipping shifts"); */
+        return;
     }
 
     // Recursive Case 2: start shiftin'
     //
-    // We only shift towards the top or the right; otherwise the algorithm
-    // will waste time shifting back and forth
-    if (!touches_edge(f, top)) {
+    // Only shift towards the top or the right.
+    for (int d = 0; d < 2; d++) {
+        if (touches_edge(f, d)) {
+            continue;
+        }
+
         // Make a copy and shift it
         field fs = fcopy(f);
-        shift(&fs, top);
-        for (int x = 0; x < fs.size; x++) {
-            // Skip spaces without anything beside them
-            if (idxo(&fs, c(x, 0), top) == fs.num_tiles) {
-                continue;
-            }
-
-            // Make another copy
-            field fsp = fcopy(&fs);
-
-            // Try to place something
-            if (try_place_any(&fsp, c(x, 0))) {
-                solve_inner(&fsp, solved, num_solved);
+        shift(&fs, d);
+        coord nf = next_free(&fs);
+        /* printf("Shifted %d\n", d); */
+        // Try to place something
+        for (int t = 0; t < fs.num_tiles; t++) {
+            if (try_place(&fs, t, nf)) {
+                solve_inner(&fs, solved, num_solved);
                 if (*num_solved == MAX_SOLVED) {
                     return;
                 }
             }
         }
-        // printf("Shifted up\n");
-    }
-    if (!touches_edge(f, right)) {
-        // Make a copy and shift it
-        field fs = fcopy(f);
-        shift(&fs, right);
-        for (int y = 0; y < fs.size; y++) {
-            // Skip spaces without anything beside them
-            if (idxo(&fs, c(0, y), right) == fs.num_tiles) {
-                continue;
-            }
-
-            // Make another copy
-            field fsp = fcopy(&fs);
-
-            // Try to place something
-            if (try_place_any(&fsp, c(0, y))) {
-                solve_inner(&fsp, solved, num_solved);
-                if (*num_solved == MAX_SOLVED) {
-                    return;
-                }
-            }
-        }
-        // printf("Shifted right\n");
     }
 
-    // printf("End reached\n");
+    /* printf("End reached\n\n"); */
 }
+
 
 int solve(field* solved, field* f) {
     field fi = fcopy(f);
 
-    // This ***must*** be placed at (0, 0) for logic to work
-    place(&fi, 0, c(0, 0));
     int num_solved = 0;
     solve_inner(&fi, solved, &num_solved);
     return num_solved;

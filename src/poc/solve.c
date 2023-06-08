@@ -4,7 +4,6 @@
 #include "tile.h"
 
 void overwrite(field* l, field* r) {
-    free_bufs(l);
     *l = *r;
 }
 
@@ -31,7 +30,6 @@ int solve_inner(field* f) {
                 return 1;
             }
         }
-        free_bufs(&fs);
     }
 
     // Case 2: start shiftin'
@@ -60,9 +58,7 @@ int solve_inner(field* f) {
                     return 1;
                 }
             }
-            free_bufs(&fsp);
         }
-        free_bufs(&fs);
     }
 
     return 0;

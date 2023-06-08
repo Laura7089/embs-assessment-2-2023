@@ -26,10 +26,5 @@ int main(int argc, char** argv) {
 
     printf("Solution found:\n");
     print_field(&solved[0]);
-
-    free_bufs(&f);
-    for (int i = 0; i < num_solved; i++) {
-        free_bufs(&solved[i]);
-    }
     return 0;
 }

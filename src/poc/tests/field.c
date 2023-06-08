@@ -37,7 +37,6 @@ field get_rubric_example_placed_asis(void) {
 
 void test_create(void) {
     field f = get_rubric_example();
-    free_bufs(&f);
 }
 
 void test_idxo(void) {
@@ -51,8 +50,6 @@ void test_idxo(void) {
     TEST_ASSERT_EQUAL(idxo(&f, c(1, 0), right), 4);
     TEST_ASSERT_EQUAL(idxo(&f, c(1, 0), bottom), 4);
     TEST_ASSERT_EQUAL(idxo(&f, c(1, 0), left), 0);
-
-    free_bufs(&f);
 }
 
 void test_place(void) {
@@ -71,8 +68,6 @@ void test_place(void) {
     TEST_ASSERT_EQUAL(idx(&f, c(1, 0)), 4);
     TEST_ASSERT_EQUAL(idx(&f, c(1, 1)), 4);
     TEST_ASSERT(!f.placed[0]);
-
-    free_bufs(&f);
 }
 
 void test_touches_edge(void) {
@@ -84,8 +79,6 @@ void test_touches_edge(void) {
     TEST_ASSERT(touches_edge(&f, left));
     TEST_ASSERT(!touches_edge(&f, top));
     TEST_ASSERT(!touches_edge(&f, right));
-
-    free_bufs(&f);
 }
 
 void test_shift(void) {
@@ -116,8 +109,6 @@ void test_shift(void) {
     TEST_ASSERT_EQUAL(idx(&f, c(0, 1)), 4);
     TEST_ASSERT_EQUAL(idx(&f, c(1, 0)), 4);
     TEST_ASSERT_EQUAL(idx(&f, c(1, 1)), 4);
-
-    free_bufs(&f);
 }
 
 void test_fits(void) {
@@ -146,8 +137,6 @@ void test_fits(void) {
         TEST_ASSERT_EQUAL(2, f.tiles[2].rotation % 4);
         TEST_ASSERT(tile_fits(&f, 3, c(1, 1)));
         TEST_ASSERT_EQUAL(0, f.tiles[3].rotation % 4);
-
-        free_bufs(&f);
     }
 
     {
@@ -157,8 +146,6 @@ void test_fits(void) {
         place(&f, 3, c(0, 0));
         TEST_ASSERT(tile_fits(&f, 2, c(0, 1)));
         TEST_ASSERT_EQUAL(1, f.tiles[2].rotation % 4);
-
-        free_bufs(&f);
     }
 }
 
@@ -179,8 +166,6 @@ void test_free_spaces(void) {
     TEST_ASSERT_EQUAL(free[2].y, 10);
     TEST_ASSERT_EQUAL(free[3].x, 10);
     TEST_ASSERT_EQUAL(free[3].y, 10);
-
-    free_bufs(&f);
 }
 
 void test_sur_colours(void) {
@@ -192,8 +177,6 @@ void test_sur_colours(void) {
         sur_colours(&f, ncols, c(1, 1));
         colour expected[] = {127, 127, 0, 4};
         TEST_ASSERT_EQUAL_CHAR_ARRAY(expected, ncols, 4);
-
-        free_bufs(&f);
     }
 
     {
@@ -204,8 +187,6 @@ void test_sur_colours(void) {
         sur_colours(&f, ncols, c(0, 0));
         colour expected[] = {0, 5, 127, 127};
         TEST_ASSERT_EQUAL_CHAR_ARRAY(expected, ncols, 4);
-
-        free_bufs(&f);
     }
 
     {
@@ -223,8 +204,6 @@ void test_sur_colours(void) {
         sur_colours(&f, ncols2, c(1, 0));
         colour expected2[] = {127, 127, 127, 2};
         TEST_ASSERT_EQUAL_CHAR_ARRAY(expected2, ncols2, 4);
-
-        free_bufs(&f);
     }
 }
 
@@ -237,8 +216,6 @@ void test_try_place(void) {
     TEST_ASSERT(try_place(&f, 2, c(0, 1)));
     TEST_ASSERT_EQUAL(2, idx(&f, c(0, 1)));
     TEST_ASSERT_EQUAL(1, f.tiles[2].rotation);
-
-    free_bufs(&f);
 }
 
 void test_repr_empty(void) {
@@ -252,8 +229,6 @@ void test_repr_empty(void) {
         buf,
         written
     );
-
-    free_bufs(&f);
 }
 
 void test_repr_filled(void) {
@@ -267,6 +242,4 @@ void test_repr_filled(void) {
         buf,
         written
     );
-
-    free_bufs(&f);
 }

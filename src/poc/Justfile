@@ -1,39 +1,39 @@
 #!/bin/env -S just --justfile
 
 TEST_DIR := "./tests"
-BIN_PREF := "main_"
+BIN_NAME := "main"
 SVG_VIEWER := env_var_or_default("BROWSER", "firefox")
 FLAME_OUT := `mktemp --tmpdir -u embs_poc_flameXXXX.svg`
 
-run type="heapless": (build type)
-    ./{{ BIN_PREF }}{{ type }}
+run: build
+    ./{{ BIN_NAME }}
 alias r := run
 
-build type="heapless":
-    make {{ BIN_PREF }}{{ type }}
+build:
+    make {{ BIN_NAME }}
 
 test:
     "{{ TEST_DIR }}/run_all.sh"
 alias t := test
 
-bench type="heapless" *args="": (build type)
+bench *args="": build
     hyperfine \
         -N \
         {{ args }} \
         -- \
-        ./{{ BIN_PREF }}{{ type }}
+        ./{{ BIN_NAME }}
 alias b := bench
 
-flame type="heapless" output=FLAME_OUT *args="": (build type)
+flame output=FLAME_OUT *args="": build
     flamegraph \
         -o "{{ output }}" \
         {{ args }} \
         -- \
-        ./{{ BIN_PREF }}{{ type }}
+        ./{{ BIN_NAME }}
     "{{ SVG_VIEWER }}" "{{ output }}"
 
 clean:
-    rm -fv {{ BIN_PREF }}/*
+    rm -fv {{ BIN_NAME }}
     rm -fv "{{ TEST_DIR }}/test_*"
     rm -fv perf.*
 alias c := clean

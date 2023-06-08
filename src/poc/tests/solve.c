@@ -34,6 +34,4 @@ void test_solve_rubric(void) {
     int num_solved = solve(solved, &f);
 
     TEST_ASSERT(solved);
-
-    free_bufs(&f);
 }

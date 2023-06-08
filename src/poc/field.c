@@ -3,6 +3,23 @@
 #include <stdio.h>
 #include "field.h"
 
+field new_field(unsigned int size) {
+    field f;
+    f.size = size;
+    f.num_tiles = size * size;
+
+    for (int i = 0; i < f.num_tiles; i++) {
+        f.inner[i] = f.num_tiles;
+        f.placed[i] = 0;
+    }
+
+    return f;
+}
+
+field fcopy(field* f) {
+    return *f;
+}
+
 // Get index into `f.inner` that `(cs.x, cs.y)` represent
 //
 // Not part of public API

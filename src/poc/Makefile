@@ -8,11 +8,8 @@ PUZZLES := puzzles
 
 .PHONY: clean clean_all
 
-main_heapless: ${SOURCES} ${HEADERS} ${PUZZLES} heapless/field_def.c heapless/field_def.h
-	${CC} ${CFLAGS} -Iheapless ${SOURCES} heapless/field_def.c -o $@
-
-main_malloc: ${SOURCES} ${HEADERS} ${PUZZLES} malloc/field_def.c malloc/field_def.h
-	${CC} ${CFLAGS} -Imalloc ${SOURCES} malloc/field_def.c -o $@
+main: ${SOURCES} ${HEADERS} ${PUZZLES}
+	${CC} ${CFLAGS} ${SOURCES} -o $@
 
 puzzles: generate_set.sh
 	./generate_set.sh ${PUZZLES}

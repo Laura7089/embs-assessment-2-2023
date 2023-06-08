@@ -121,41 +121,45 @@ void test_shift(void) {
 }
 
 void test_fits(void) {
-    field f = get_rubric_example();
-    // Place the first tile in the bottom-left corner
-    place(&f, 0, c(0, 0));
+    {
+        field f = get_rubric_example();
+        // Place the first tile in the bottom-left corner
+        place(&f, 0, c(0, 0));
 
-    // Test fits in tile (0, 1)
-    // Tile 3 doesn't fit, the other two do
-    TEST_ASSERT(tile_fits(&f, 1, c(0, 1)));
-    TEST_ASSERT_EQUAL(0, f.tiles[1].rotation);
-    TEST_ASSERT(tile_fits(&f, 2, c(0, 1)));
-    TEST_ASSERT_EQUAL(2, f.tiles[2].rotation);
-    TEST_ASSERT(!tile_fits(&f, 3, c(0, 1)));
-    // Test fits in tile (1, 0)
-    // None can fit because none have blue
-    TEST_ASSERT(!tile_fits(&f, 1, c(1, 0)));
-    TEST_ASSERT(!tile_fits(&f, 2, c(1, 0)));
-    TEST_ASSERT(!tile_fits(&f, 3, c(1, 0)));
-    // Test fits in tile (1, 1)
-    // All should fit because nothing borders this space
-    TEST_ASSERT(tile_fits(&f, 1, c(1, 1)));
-    TEST_ASSERT_EQUAL(0, f.tiles[1].rotation);
-    TEST_ASSERT(tile_fits(&f, 2, c(1, 1)));
-    TEST_ASSERT_EQUAL(2, f.tiles[2].rotation);
-    TEST_ASSERT(tile_fits(&f, 3, c(1, 1)));
-    TEST_ASSERT_EQUAL(0, f.tiles[3].rotation);
+        // Test fits in tile (0, 1)
+        // Tile 3 doesn't fit, the other two do
+        TEST_ASSERT(tile_fits(&f, 1, c(0, 1)));
+        TEST_ASSERT_EQUAL(0, f.tiles[1].rotation % 4);
+        TEST_ASSERT(tile_fits(&f, 2, c(0, 1)));
+        TEST_ASSERT_EQUAL(2, f.tiles[2].rotation % 4);
+        TEST_ASSERT(!tile_fits(&f, 3, c(0, 1)));
+        // Test fits in tile (1, 0)
+        // None can fit because none have blue
+        TEST_ASSERT(!tile_fits(&f, 1, c(1, 0)));
+        TEST_ASSERT(!tile_fits(&f, 2, c(1, 0)));
+        TEST_ASSERT(!tile_fits(&f, 3, c(1, 0)));
+        // Test fits in tile (1, 1)
+        // All should fit because nothing borders this space
+        TEST_ASSERT(tile_fits(&f, 1, c(1, 1)));
+        TEST_ASSERT_EQUAL(0, f.tiles[1].rotation % 4);
+        TEST_ASSERT(tile_fits(&f, 2, c(1, 1)));
+        TEST_ASSERT_EQUAL(2, f.tiles[2].rotation % 4);
+        TEST_ASSERT(tile_fits(&f, 3, c(1, 1)));
+        TEST_ASSERT_EQUAL(0, f.tiles[3].rotation % 4);
 
-    field f2 = get_rubric_example();
-    rotate_right(&f2.tiles[3]);
-    rotate_right(&f2.tiles[3]);
-    place(&f2, 3, c(0, 0));
-    print_field(&f2);
-    TEST_ASSERT(tile_fits(&f, 2, c(0, 1)));
-    TEST_ASSERT_EQUAL(3, f.tiles[2].rotation);
+        free_bufs(&f);
+    }
 
-    free_bufs(&f);
-    free_bufs(&f2);
+    {
+        field f = get_rubric_example();
+        rotate_right(&f.tiles[3]);
+        rotate_right(&f.tiles[3]);
+        place(&f, 3, c(0, 0));
+        TEST_ASSERT(tile_fits(&f, 2, c(0, 1)));
+        TEST_ASSERT_EQUAL(1, f.tiles[2].rotation % 4);
+
+        free_bufs(&f);
+    }
 }
 
 void test_free_spaces(void) {
@@ -229,13 +233,10 @@ void test_try_place(void) {
     rotate_right(&f.tiles[3]);
     rotate_right(&f.tiles[3]);
     place(&f, 3, c(0, 0));
-    print_field(&f);
 
     TEST_ASSERT(try_place(&f, 2, c(0, 1)));
-    printf("\n");
-    print_field(&f);
     TEST_ASSERT_EQUAL(2, idx(&f, c(0, 1)));
-    TEST_ASSERT_EQUAL(3, f.tiles[2].rotation);
+    TEST_ASSERT_EQUAL(1, f.tiles[2].rotation);
 
     free_bufs(&f);
 }

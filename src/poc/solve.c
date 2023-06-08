@@ -9,7 +9,7 @@ void overwrite(field* l, field* r) {
 }
 
 int solve_inner(field* f) {
-    coord* frees = malloc((f->num_tiles-1) * sizeof(coord));
+    coord frees[f->num_tiles / 2];
     unsigned int num_free = free_cells(f, frees);
 
     // Base case
@@ -47,7 +47,7 @@ int solve_inner(field* f) {
 
         // Try to place a tile
         // We have to try to place one otherwise the `solve` calls will keep shifting back and forth
-        coord* frees = malloc(num_unplaced(&fs) * sizeof(coord));
+        coord frees[fs.num_tiles / 2];
         unsigned int num_free = free_cells(&fs, frees);
         for (int i = 0; i < num_free; i++) {
             // Make another copy

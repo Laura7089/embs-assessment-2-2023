@@ -3,69 +3,97 @@
 #include "field.h"
 #include "tile.h"
 
+#include <stdio.h>
+
 void solve_inner(field* f, field* solved, int* num_solved) {
     if (*num_solved == MAX_SOLVED) {
         return;
     }
 
-    coord frees[f->num_tiles / 2];
-    unsigned int num_free = free_cells(f, frees);
+    // printf("Solve called with:\n");
+    // print_field(f);
 
-    // Base case
-    if (num_free == 1) {
-        solved[*num_solved] = fcopy(f);
-        if (try_place_any(&solved[*num_solved], frees[0])) {
-            *num_solved += 1;
+    {
+        coord frees[f->num_tiles / 2];
+        unsigned int num_free = free_cells(f, frees);
+
+        // Base case
+        if (num_free == 1) {
+            solved[*num_solved] = fcopy(f);
+            if (try_place_any(&solved[*num_solved], frees[0])) {
+                // printf("Base case found:\n");
+                // print_field(&solved[*num_solved]);
+                *num_solved += 1;
+            }
+            // Return immediately because there's no point recursing here
+            return;
         }
-        // Return immediately because there's no point recursing here
-        return;
-    }
 
-    // Recursive case(s)
-    // Case 1: plain ol' placing
-    for (int i = 0; i < num_free; i++) {
-        field fs = fcopy(f);
-        if (try_place_any(&fs, frees[i])) {
-            solve_inner(&fs, solved, num_solved);
-            if (*num_solved == MAX_SOLVED) {
-                return;
+        // Recursive Case 1: plain ol' placing
+        for (int i = 0; i < num_free; i++) {
+            field fs = fcopy(f);
+            if (try_place_any(&fs, frees[i])) {
+                solve_inner(&fs, solved, num_solved);
+                if (*num_solved == MAX_SOLVED) {
+                    return;
+                }
             }
         }
+        // printf("Recursive cases run on %d possible squares\n", num_free);
     }
 
-    // Case 2: start shiftin'
+    // Recursive Case 2: start shiftin'
     //
     // We only shift towards the top or the right; otherwise the algorithm
     // will waste time shifting back and forth
-    for (int d = 0; d < 2; d++) {
-        if (touches_edge(f, d)) {
-            // We can't shift in this direction
-            continue;
-        }
-
-        // Make a copy and shift it in the given direction
+    if (!touches_edge(f, top)) {
+        // Make a copy and shift it
         field fs = fcopy(f);
-        shift(&fs, d);
+        shift(&fs, top);
+        for (int x = 0; x < fs.size; x++) {
+            // Skip spaces without anything beside them
+            if (idxo(&fs, c(x, 0), top) == fs.num_tiles) {
+                continue;
+            }
 
-        // Try to place a tile
-        // We have to try to place one otherwise the `solve` calls will keep shifting back and forth
-        // Only need to check bottom-left tiles since those are the
-        // only ones we can have freed by shifting top or right
-        coord frees[fs.num_tiles / 2];
-        unsigned int num_free = free_cells_dir(&fs, frees, d);
-        for (int i = 0; i < num_free; i++) {
             // Make another copy
             field fsp = fcopy(&fs);
 
             // Try to place something
-            if (try_place_any(&fsp, frees[i])) {
+            if (try_place_any(&fsp, c(x, 0))) {
                 solve_inner(&fsp, solved, num_solved);
                 if (*num_solved == MAX_SOLVED) {
                     return;
                 }
             }
         }
+        // printf("Shifted up\n");
     }
+    if (!touches_edge(f, right)) {
+        // Make a copy and shift it
+        field fs = fcopy(f);
+        shift(&fs, right);
+        for (int y = 0; y < fs.size; y++) {
+            // Skip spaces without anything beside them
+            if (idxo(&fs, c(0, y), right) == fs.num_tiles) {
+                continue;
+            }
+
+            // Make another copy
+            field fsp = fcopy(&fs);
+
+            // Try to place something
+            if (try_place_any(&fsp, c(0, y))) {
+                solve_inner(&fsp, solved, num_solved);
+                if (*num_solved == MAX_SOLVED) {
+                    return;
+                }
+            }
+        }
+        // printf("Shifted right\n");
+    }
+
+    // printf("End reached\n");
 }
 
 int solve(field* solved, field* f) {

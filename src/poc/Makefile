@@ -19,6 +19,7 @@ puzzles: generate_set.sh
 
 clean:
 	rm -fv main_*
+	cd tests && make clean
 
 clean_all: clean
 	rm -rfv ${PUZZLES}

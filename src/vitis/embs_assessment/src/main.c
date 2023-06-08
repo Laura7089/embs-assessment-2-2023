@@ -37,7 +37,7 @@ void make_and_send_puzzle_req(struct udp_pcb *send_pcb) {
 	bytes_from_seed(&request_msg[2], seed);
 
 	// Create a packet buffer and set the payload as the message
-	printf("Sending [%d, %d, %d, %d, %d, %d]\n", request_msg[0], request_msg[1], request_msg[2], request_msg[3], request_msg[4], request_msg[5]);
+	printf("\nSending [%d, %d, %d, %d, %d, %d]\n", request_msg[0], request_msg[1], request_msg[2], request_msg[3], request_msg[4], request_msg[5]);
     struct pbuf * request = pbuf_alloc(PBUF_TRANSPORT, 6, PBUF_REF);
     request->payload = request_msg;
 	// Send the message
@@ -109,7 +109,6 @@ void udp_get_handler(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_ad
         } else {
         	browse_solutions(&f, 1);
         }
-        print_field(&f);
 
         pbuf_free(p);
 
@@ -128,8 +127,50 @@ int main()
 
     print("\n\n\n\n================================================================\n\r");
 
-	init_platform(MAC_ADDR, NULL, NULL);
 	hdmi_setup();
+
+    printf("\nAs a fallback, you may opt not to use ethernet and show only a preset solution over HDMI.\n");
+    printf("Enter 1 to continue with eth setup as normal, or 2 to just show HDMI\n");
+
+    char choice[2];
+    scanf("%2s", choice);
+
+    if (choice[0] == '2') {
+    	printf("HDMI static mode selected.");
+
+    	const tile SAMPLE_TILES[16] = {
+			{{3, 1, 4, 6}, 0},
+			{{8, 7, 3, 3}, 0},
+			{{4, 5, 8, 9}, 0},
+			{{2, 1, 4, 1}, 0},
+			{{8, 4, 3, 1}, 0},
+			{{2, 6, 8, 7}, 0},
+			{{7, 1, 2, 5}, 0},
+			{{2, 3, 7, 1}, 0},
+			{{5, 1, 9, 4}, 0},
+			{{6, 1, 6, 5}, 0},
+			{{9, 3, 6, 1}, 0},
+			{{1, 2, 9, 3}, 0},
+			{{6, 7, 2, 1}, 0},
+			{{5, 8, 6, 1}, 0},
+			{{5, 2, 5, 2}, 0},
+			{{4, 5, 5, 2}, 0}
+    	};
+
+    	field sample = new_field(4);
+    	sample.tiles = SAMPLE_TILES;
+
+    	for (int i = 0; i < 16; i++) {
+    		sample.placed[i] = 1;
+    		sample.inner[i] = i;
+    	}
+
+    	show_field_hdmi(&sample);
+
+    	while (1) {}
+    }
+
+	init_platform(MAC_ADDR, NULL, NULL);
 
 	struct udp_pcb *recv_pcb = udp_new();
 	if (!recv_pcb) {

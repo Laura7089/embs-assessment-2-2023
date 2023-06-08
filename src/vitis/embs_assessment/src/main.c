@@ -12,14 +12,7 @@ unsigned short PUZZLE_SERVER_PORT = 51100;
 unsigned char MAC_ADDR[] = {0x00, 0x11, 0x22, 0x33, 0x00, 0x26};
 
 uint32_t seed_from_bytes(char* bytes) {
-	return 0; // TODO
-}
-
-void bytes_from_seed(char* buf, uint32_t seed) {
-	for (int i = 3; i >= 0; i--) {
-		uint32_t mask = 0b11111111 << i;
-		buf[3-i] = (seed & mask) >> i;
-	}
+	return (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
 }
 
 void make_and_send_puzzle_req(struct udp_pcb *send_pcb) {
@@ -38,7 +31,10 @@ void make_and_send_puzzle_req(struct udp_pcb *send_pcb) {
 	char request_msg[6];
 	request_msg[0] = 1;
 	request_msg[1] = size;
-	bytes_from_seed(&request_msg[2], seed);
+	for (int i = 3; i >= 0; i--) {
+		uint32_t mask = 0xFF << (i * 8);
+		request_msg[5-i] = (seed & mask) >> (i * 8);
+	}
 
 	// Create a packet buffer and set the payload as the message
 	printf("\nSending [%d, %d, %d, %d, %d, %d]\n", request_msg[0], request_msg[1], request_msg[2], request_msg[3], request_msg[4], request_msg[5]);

@@ -84,7 +84,7 @@ void show_gradient(void) {
 }
 
 void write_colour_row(u32* buf, u32 col) {
-	for (int i = 0; i < TILE_SIDE; i++) {
+	for (int i = 0; i < COLOUR_SIDE; i++) {
 		buf[i] = col;
 	}
 }
@@ -119,20 +119,17 @@ void show_field_hdmi(field* f) {
 				if (t != f->num_tiles) {
 					int colour = colour_mapping[get_side(f->tiles[t], top)];
 					// Blank
-					write_colour_row(&frame[this_row_off], 0);
 					this_row_off += COLOUR_SIDE;
 
 					write_colour_row(&frame[this_row_off], colour);
 					this_row_off += COLOUR_SIDE;
 
 					// Blank
-					write_colour_row(&frame[this_row_off], 0);
 					this_row_off += COLOUR_SIDE;
 				} else {
 					// Do nothing if the tile isn't placed, leave the space black
 					this_row_off += TILE_SIDE;
 				}
-				frame[this_row_off] = 0;
 				this_row_off += 1;
 			}
 			buf_offset += stride;
@@ -159,7 +156,6 @@ void show_field_hdmi(field* f) {
 					// Do nothing if the tile isn't placed, leave the space black
 					this_row_off += TILE_SIDE;
 				}
-				frame[this_row_off] = 0;
 				this_row_off += 1;
 			}
 			buf_offset += stride;
@@ -172,29 +168,23 @@ void show_field_hdmi(field* f) {
 				if (t != f->num_tiles) {
 					int colour = colour_mapping[get_side(f->tiles[t], bottom)];
 					// Blank
-					write_colour_row(&frame[this_row_off], 0);
 					this_row_off += COLOUR_SIDE;
 
 					write_colour_row(&frame[this_row_off], colour);
 					this_row_off += COLOUR_SIDE;
 
 					// Blank
-					write_colour_row(&frame[this_row_off], 0);
 					this_row_off += COLOUR_SIDE;
 				} else {
 					// Do nothing if the tile isn't placed, leave the space black
 					this_row_off += TILE_SIDE;
 				}
-				frame[this_row_off] = 0;
 				this_row_off += 1;
 			}
 			buf_offset += stride;
 		}
 
 		// Write a black row
-		for (int x = 0; x < stride; x++) {
-			frame[buf_offset + x] = 0;
-		}
 		buf_offset += stride;
 	}
 

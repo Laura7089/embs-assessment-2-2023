@@ -7,16 +7,22 @@ void overwrite(field* l, field* r) {
     *l = *r;
 }
 
-int solve_inner(field* f) {
+void solve_inner(field* f, field* solved, int* num_solved) {
+    if (*num_solved == MAX_SOLVED) {
+        return;
+    }
+
     coord frees[f->num_tiles / 2];
     unsigned int num_free = free_cells(f, frees);
 
     // Base case
     if (num_free == 1) {
-        if (try_place_any(f, frees[0])) {
-            return 1;
-        } else {
-            return 0;
+        solved[*num_solved] = fcopy(f);
+        if (try_place_any(&solved[*num_solved], frees[0])) {
+            *num_solved += 1;
+            if (*num_solved == MAX_SOLVED) {
+                return;
+            }
         }
     }
 
@@ -25,9 +31,9 @@ int solve_inner(field* f) {
     for (int i = 0; i < num_free; i++) {
         field fs = fcopy(f);
         if (try_place_any(&fs, frees[i])) {
-            if (solve_inner(&fs)) {
-                overwrite(f, &fs);
-                return 1;
+            solve_inner(&fs, solved, num_solved);
+            if (*num_solved == MAX_SOLVED) {
+                return;
             }
         }
     }
@@ -53,25 +59,20 @@ int solve_inner(field* f) {
 
             // Try to place something
             if (try_place_any(&fsp, frees[i])) {
-                if (solve_inner(&fsp)) {
-                    overwrite(f, &fsp);
-                    return 1;
+                solve_inner(&fsp, solved, num_solved);
+                if (*num_solved == MAX_SOLVED) {
+                    return;
                 }
             }
         }
     }
-
-    return 0;
 }
 
 int solve(field* solved, field* f) {
     field fi = fcopy(f);
 
     place(&fi, 0, c(0, 0));
-    if (solve_inner(&fi)) {
-        solved[0] = fi;
-        return 1;
-    } else {
-        return 0;
-    }
+    int num_solved = 0;
+    solve_inner(&fi, solved, &num_solved);
+    return num_solved;
 }

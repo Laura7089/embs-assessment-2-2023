@@ -21,10 +21,14 @@ int main(int argc, char** argv) {
     field solved[MAX_SOLVED];
     int num_solved = solve(solved, &f);
     if (!num_solved) {
+        printf("No solutions found\n");
         return 1;
     }
 
-    printf("Solution found:\n");
-    print_field(&solved[0]);
+    printf("%d solution(s) found:\n", num_solved);
+    for (int i = 0; i < num_solved; i++) {
+        printf("\n");
+        print_field(&solved[i]);
+    }
     return 0;
 }

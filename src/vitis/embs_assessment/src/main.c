@@ -3,6 +3,7 @@
 #include "platform.h"
 #include "xil_printf.h"
 #include "xil_cache.h"
+#include "xtime_l.h"
 #include "field.h"
 #include "solve.h"
 
@@ -104,8 +105,16 @@ void udp_get_handler(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_ad
 
         // Solve it
         printf("\nTrying to solve...\n");
+        // Set up timing
+        XTime startTime, endTime;
         field solved[MAX_SOLVED];
+        XTime_GetTime(&startTime);
+
         int num_solved = solve(solved, &f);
+
+        XTime_GetTime(&endTime);
+        float elapsed = 1000.0 * (endTime - startTime) / COUNTS_PER_SECOND;
+        printf("Solving finished in %fms\n", elapsed);
 
         if (!num_solved) {
         	printf("Couldn't find any solutions	\n");

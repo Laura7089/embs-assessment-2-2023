@@ -8,7 +8,7 @@ void overwrite(field* l, field* r) {
     *l = *r;
 }
 
-int solve(field* f) {
+int solve_inner(field* f) {
     coord* frees = malloc((f->num_tiles-1) * sizeof(coord));
     unsigned int num_free = free_cells(f, frees);
 
@@ -26,7 +26,7 @@ int solve(field* f) {
     for (int i = 0; i < num_free; i++) {
         field fs = fcopy(f);
         if (try_place_any(&fs, frees[i])) {
-            if (solve(&fs)) {
+            if (solve_inner(&fs)) {
                 overwrite(f, &fs);
                 return 1;
             }
@@ -55,7 +55,7 @@ int solve(field* f) {
 
             // Try to place something
             if (try_place_any(&fsp, frees[i])) {
-                if (solve(&fsp)) {
+                if (solve_inner(&fsp)) {
                     overwrite(f, &fsp);
                     return 1;
                 }
@@ -66,4 +66,16 @@ int solve(field* f) {
     }
 
     return 0;
+}
+
+int solve(field* solved, field* f) {
+    field fi = fcopy(f);
+
+    place(&fi, 0, c(0, 0));
+    if (solve_inner(&fi)) {
+        solved[0] = fi;
+        return 1;
+    } else {
+        return 0;
+    }
 }

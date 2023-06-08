@@ -24,9 +24,13 @@ void bytes_from_seed(char* buf, uint32_t seed) {
 
 void make_and_send_puzzle_req(struct udp_pcb *send_pcb) {
 	// Assemble the request
-	printf("Enter puzzle size");
 	char size;
+	printf("\nEnter puzzle size");
 	scanf("%hhu", &size);
+	while (size < 2 || size > 8) {
+		printf("\nIllegal size %d, please enter again", size);
+		scanf("%hhu", &size);
+	}
 	printf("\nEnter random seed");
 	uint32_t seed;
 	scanf("%lu", &seed);
@@ -78,7 +82,7 @@ void udp_get_handler(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_ad
     if (p) {
     	char* payload = (char*)p->payload;
 
-    	printf("\n\nGot a new packet:\n");
+    	printf("\nGot a packet:\n");
     	char header[MSG_HEADER_SIZE];
         memcpy(header, payload, MSG_HEADER_SIZE);
         printf("Header: [%d, %d, %d, %d, %d, %d]\n", header[0], header[1], header[2], header[3], header[4], header[5]);
@@ -104,11 +108,14 @@ void udp_get_handler(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_ad
 
         // Solve it
         printf("\nTrying to solve...\n");
-        place(&f, 0, c(0, 0));
-        if (!solve(&f)) {
-        	printf("Couldn't find any solutions, I tried this start:\n");
+        field solved[MAX_SOLVED];
+        int num_solved = solve(solved, &f);
+
+        if (!num_solved) {
+        	printf("Couldn't find any solutions	\n");
         } else {
-        	browse_solutions(&f, 1);
+        	printf("Found %d solutions, opening browser\n", num_solved);
+        	browse_solutions(solved, num_solved);
         }
 
         pbuf_free(p);

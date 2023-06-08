@@ -5,12 +5,12 @@ BIN_NAME := "main"
 SVG_VIEWER := env_var_or_default("BROWSER", "firefox")
 FLAME_OUT := `mktemp --tmpdir -u embs_poc_flameXXXX.svg`
 
-run: build
+run size: (build size)
     ./{{ BIN_NAME }}
 alias r := run
 
-build *args="":
-    make {{ args }} {{ BIN_NAME }}
+build size epoch=`echo $(($RANDOM % 10))` *args="":
+    make SIZE={{ size }} EPOCH={{ epoch }} {{ args }} {{ BIN_NAME }}
 
 debug debugger="gdb" *args="": (build "'CFLAGS=-g -O0'")
     "{{ debugger }}" {{ args }} {{ BIN_NAME }}
@@ -20,7 +20,7 @@ test:
     "{{ TEST_DIR }}/run_all.sh"
 alias t := test
 
-bench *args="": build
+bench size *args="": (build size)
     hyperfine \
         -N \
         {{ args }} \
@@ -28,7 +28,7 @@ bench *args="": build
         ./{{ BIN_NAME }}
 alias b := bench
 
-flame output=FLAME_OUT *args="": build
+flame size output=FLAME_OUT *args="": (build size)
     flamegraph \
         -o "{{ output }}" \
         {{ args }} \

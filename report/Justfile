@@ -4,17 +4,8 @@ SOURCE_DIR := "../source"
 ROOT_TEX_FILE := "./submission.tex"
 
 # Compile a report, select builder dynamically
-report builder="pdflatex":
-    just report_{{builder}}
-
-# Compile a report with `latexmk`
-report_latexmk: supporting
-    latexmk --pdf
-
-# Compile a report with `pdflatex`
-report_pdflatex: supporting
-    pdflatex {{ ROOT_TEX_FILE }}
-    pdflatex {{ ROOT_TEX_FILE }}
+report:
+    tectonic "{{ ROOT_TEX_FILE }}"
 
 # Create all supporting material
 supporting: exam_number wordcount

@@ -6,10 +6,10 @@ colour get_side(tile t, side s) {
     side wanted = (s + t.rotation) % 4;
     return t.colours[wanted];
 }
-void rotate_right(tile* t) {
+void rotate_left(tile* t) {
     t->rotation += 1;
 }
-void rotate_left(tile* t) {
+void rotate_right(tile* t) {
     if (t->rotation == 0) {
         t->rotation = 4;
     }

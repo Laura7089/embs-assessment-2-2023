@@ -4,6 +4,7 @@
 #include "xil_printf.h"
 #include "xil_cache.h"
 #include "field.h"
+#include "solve.h"
 
 const unsigned int MSG_HEADER_SIZE = 6;
 ip_addr_t PUZZLE_SERVER_IP;
@@ -23,15 +24,12 @@ void bytes_from_seed(char* buf, uint32_t seed) {
 
 void make_puzzle_req(char* buf) {
 	// Assemble the request
-//	printf("Enter puzzle size: ");
-//	char size;
-//	scanf("%hhu\n", &size);
-//	printf("Enter random seed [0]: ");
-//	uint32_t seed;
-//	scanf("%lu\n");
-
-	char size = 2;
-	uint32_t seed = 0;
+	printf("Enter puzzle size");
+	char size;
+	scanf("%hhu", &size);
+	printf("\nEnter random seed");
+	uint32_t seed;
+	scanf("%lu", &seed);
 
 	buf[0] = 1;
 	buf[1] = size;
@@ -93,6 +91,8 @@ void udp_get_handler(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_ad
         pbuf_free(p);
 
         // Send another request!
+        printf("\n");
+		make_and_send_puzzle_req(pcb);
     } else {
     	printf("ERROR: invalid protocol control block received\n");
     }
@@ -115,23 +115,13 @@ int main()
 	udp_bind(recv_pcb, IP_ADDR_ANY, PUZZLE_SERVER_PORT);
 	// Set up the receive handler
 	udp_recv(recv_pcb, udp_get_handler, NULL);
-	// Create a protocol control block (PCB)
+
 	struct udp_pcb *send_pcb = udp_new();
-
-	// Send a request for the puzzle
-	char request_msg[6];
-	make_puzzle_req(request_msg);
-	// Create a packet buffer and set the payload as the message
-	printf("Sending [%d, %d, %d, %d, %d, %d]\n", request_msg[0], request_msg[1], request_msg[2], request_msg[3], request_msg[4], request_msg[5]);
-    struct pbuf * request = pbuf_alloc(PBUF_TRANSPORT, 6, PBUF_REF);
-    request->payload = request_msg;
-	// Send the message
-	udp_sendto(send_pcb, request, &PUZZLE_SERVER_IP, PUZZLE_SERVER_PORT);
-	pbuf_free(request);
-
-	// Remove the send PCB because we don't re-use it in this example
+	make_and_send_puzzle_req(send_pcb);
+	// Remove the send PCB because we use the recv pcb in the handler
 	udp_remove(send_pcb);
 
+	printf("\n\n");
 	// Now enter the handling loop
 	while (1) {
 		handle_ethernet();

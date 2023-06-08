@@ -66,6 +66,7 @@ void browse_solutions(field* fields, int num_fields) {
 		printf("\nSolution %d:\n", cur_field + 1);
 		print_field(&fields[cur_field]);
 		printf("\n");
+    	show_field_hdmi(&fields[cur_field]);
 
 		printf("What would you like to do next? [(p)revious, (n)ext, (q)uit]");
 		scanf("%2s", next_instr);
@@ -182,9 +183,6 @@ int main()
 	udp_bind(recv_pcb, IP_ADDR_ANY, PUZZLE_SERVER_PORT);
 	// Set up the receive handler
 	udp_recv(recv_pcb, udp_get_handler, NULL);
-
-	printf("Running HDMI gradient example...");
-	show_gradient();
 
 	printf("Setup Complete\n\n");
 

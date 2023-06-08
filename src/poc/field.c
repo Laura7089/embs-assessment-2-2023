@@ -380,3 +380,16 @@ void print_field(field* f) {
     repr_field(buf, f);
     printf("%s\n", buf);
 }
+
+int placement_equal(field* l, field* r) {
+    for (int t = 0; t < l->num_tiles; t++) {
+        if (l->inner[t] != r->inner[t]) {
+            return 0;
+        }
+        if (l->tiles[t].rotation != r->tiles[t].rotation) {
+            return 0;
+        }
+    }
+
+    return 1;
+}

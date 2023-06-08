@@ -92,6 +92,9 @@ unsigned int free_cells(field* f, coord* buf);
 // Returns length of data written to `buf`
 unsigned int free_cells_dir(field* f, coord* buf, side border);
 
+// Check if the tile placements of two `fields` are identical
+int placement_equal(field* l, field* r);
+
 // Write a string representation of `f` to `buf`
 //
 // Returns how many characters were written.

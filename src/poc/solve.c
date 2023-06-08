@@ -5,6 +5,16 @@
 
 #include <stdio.h>
 
+int already_solved(field* f, field* solved, int num_solved) {
+    for (int i = 0; i < num_solved; i++) {
+        if (placement_equal(f, &solved[i])) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 void solve_inner(field* f, field* solved, int* num_solved) {
     if (*num_solved == MAX_SOLVED) {
         return;
@@ -21,9 +31,11 @@ void solve_inner(field* f, field* solved, int* num_solved) {
         if (num_free == 1) {
             solved[*num_solved] = fcopy(f);
             if (try_place_any(&solved[*num_solved], frees[0])) {
-                // printf("Base case found:\n");
-                // print_field(&solved[*num_solved]);
-                *num_solved += 1;
+                if (!already_solved(&solved[*num_solved], solved, *num_solved)) {
+                    // printf("Base case found:\n");
+                    // print_field(&solved[*num_solved]);
+                    *num_solved += 1;
+                }
             }
             // Return immediately because there's no point recursing here
             return;

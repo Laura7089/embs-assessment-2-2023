@@ -6,7 +6,7 @@ SVG_VIEWER := env_var_or_default("BROWSER", "firefox")
 FLAME_OUT := `mktemp --tmpdir -u embs_poc_flameXXXX.svg`
 
 run size: (build size)
-    ./{{ BIN_NAME }}
+    time ./{{ BIN_NAME }}
 alias r := run
 
 build size epoch=`echo $(($RANDOM % 10))` *args="":

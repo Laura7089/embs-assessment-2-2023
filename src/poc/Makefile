@@ -9,7 +9,7 @@ PUZZLES := puzzles
 SIZE := 3
 EPOCH := 0
 
-.PHONY: clean clean_all
+.PHONY: clean clean_all main.c
 
 main: ${SOURCES} ${HEADERS} ${PUZZLES}
 	${CC} ${CFLAGS} ${SOURCES} -o $@

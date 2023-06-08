@@ -25,8 +25,42 @@ void udp_get_handler(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_ad
 
 int main()
 {
-	unsigned char mac_ethernet_address[] = {0x00, 0x11, 0x22, 0x33, 0x00, 0xXX}; // Put your own MAC address here!
+	unsigned char mac_ethernet_address[] = {0x00, 0x11, 0x22, 0x33, 0x00, 0x26};
 	init_platform(mac_ethernet_address, NULL, NULL);
+
+//	struct udp_pcb *recv_pcb = udp_new();
+//	if (!recv_pcb) {
+//		printf("Error creating PCB\n");
+//	}
+//
+//	// Listen on port 7001
+//	udp_bind(recv_pcb, IP_ADDR_ANY, 7001);
+//	// Set up the receive handler
+//	udp_recv(recv_pcb, udp_get_handler, NULL);
+//
+//	// Send an initial message
+//	// Create a protocol control block (PCB)
+//	struct udp_pcb *send_pcb = udp_new();
+//	// Create a packet buffer and set the payload as the message
+//	struct pbuf * reply = pbuf_alloc(PBUF_TRANSPORT, strlen(message), PBUF_REF);
+//	reply->payload = message;
+//	reply->len = strlen(message);
+//	// Send the message
+//	ip_addr_t ip;
+//	IP4_ADDR(&ip, 192, 168, 9, 1);
+//	udp_sendto(send_pcb, reply, &ip, 8000);
+//
+//	// Don't forget to free the packet buffer!
+//	pbuf_free(reply);
+//
+//	// Remove the send PCB because we don't re-use it in this example
+//	udp_remove(send_pcb);
+//
+//	// Now enter the handling loop
+//	while (1) {
+//		handle_ethernet();
+//	}
+//	return 0;
 
     print("Hello World\n\r");
     print("Successfully ran Hello World application");

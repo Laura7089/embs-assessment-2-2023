@@ -1,0 +1,42 @@
+#!/bin/env -S just --justfile
+
+TEST_DIR := "./tests"
+BIN_PREF := "main_"
+SVG_VIEWER := env_var_or_default("BROWSER", "firefox")
+FLAME_OUT := `mktemp --tmpdir -u embs_poc_flameXXXX.svg`
+
+run type="heapless": (build type)
+    ./{{ BIN_PREF }}{{ type }}
+alias r := run
+
+build type="heapless":
+    make {{ BIN_PREF }}{{ type }}
+
+test:
+    "{{ TEST_DIR }}/run_all.sh"
+alias t := test
+
+bench type="heapless" *args="": (build type)
+    hyperfine \
+        -N \
+        {{ args }} \
+        -- \
+        ./{{ BIN_PREF }}{{ type }}
+alias b := bench
+
+flame type="heapless" output=FLAME_OUT *args="": (build type)
+    flamegraph \
+        -o "{{ output }}" \
+        {{ args }} \
+        -- \
+        ./{{ BIN_PREF }}{{ type }}
+    "{{ SVG_VIEWER }}" "{{ output }}"
+
+clean:
+    rm -fv {{ BIN_PREF }}/*
+    rm -fv "{{ TEST_DIR }}/test_*"
+    rm -fv perf.*
+alias c := clean
+
+clean_all: clean
+    rm -rf puzzles

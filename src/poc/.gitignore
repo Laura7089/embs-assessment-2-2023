@@ -61,3 +61,4 @@ tests/test*
 main*
 __pycache__
 puzzles
+perf.*

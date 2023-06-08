@@ -16,10 +16,3 @@ main_malloc: ${SOURCES} ${HEADERS} ${PUZZLES} malloc/field_def.c malloc/field_de
 
 puzzles: generate_set.sh
 	./generate_set.sh ${PUZZLES}
-
-clean:
-	rm -fv main_*
-	cd tests && make clean
-
-clean_all: clean
-	rm -rfv ${PUZZLES}

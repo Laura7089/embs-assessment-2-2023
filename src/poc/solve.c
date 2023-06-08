@@ -3,10 +3,6 @@
 #include "field.h"
 #include "tile.h"
 
-void overwrite(field* l, field* r) {
-    *l = *r;
-}
-
 void solve_inner(field* f, field* solved, int* num_solved) {
     if (*num_solved == MAX_SOLVED) {
         return;
@@ -39,7 +35,10 @@ void solve_inner(field* f, field* solved, int* num_solved) {
     }
 
     // Case 2: start shiftin'
-    for (int d = 0; d < 4; d++) {
+    //
+    // We only shift towards the top or the right; otherwise the algorithm
+    // will waste time shifting back and forth
+    for (int d = 0; d < 2; d++) {
         if (touches_edge(f, d)) {
             // We can't shift in this direction
             continue;
@@ -71,6 +70,7 @@ void solve_inner(field* f, field* solved, int* num_solved) {
 int solve(field* solved, field* f) {
     field fi = fcopy(f);
 
+    // This ***must*** be placed at (0, 0) for logic to work
     place(&fi, 0, c(0, 0));
     int num_solved = 0;
     solve_inner(&fi, solved, &num_solved);

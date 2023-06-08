@@ -6,4 +6,5 @@
 //
 // Writes solved fields to `solved`, returns number written.
 // If no solutions, noop and return 0.
+// `f` must have NO PLACED TILES.
 int solve(field* solved, field* f);

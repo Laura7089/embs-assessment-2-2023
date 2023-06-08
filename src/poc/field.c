@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include "field.h"
 
 // Get index into `f.inner` that `(cs.x, cs.y)` represent
@@ -65,27 +66,32 @@ void unplace(field* f, coord cs) {
     f->placed[t] = 0;
 }
 
-int tile_fits(field* f, unsigned int t, coord cs) {
-    // Figure out the sequence of colours we need
-    colour invalid = 127;
-    colour needed_colours[4];
+const colour INVALID = 127;
+
+void sur_colours(field* f, colour* buf, coord cs) {
     for (int s = 0; s < 4; s++) {
         unsigned int i = idxo(f, cs, s);
         if (i == f->num_tiles) {
             // Location is out of bounds
-            needed_colours[s] = invalid;
+            buf[s] = INVALID;
             continue;
         }
 
         unsigned int adj = f->inner[i];
         if (adj == f->num_tiles) {
             // No tile is placed there ergo anything will fit
-            needed_colours[s] = invalid;
+            buf[s] = INVALID;
             continue;
         }
 
-        needed_colours[s] = get_side(f->tiles[adj], opposite(s));
+        buf[s] = get_side(f->tiles[adj], opposite(s));
     }
+}
+
+int tile_fits(field* f, unsigned int t, coord cs) {
+    // Figure out the sequence of colours we need
+    colour needed_colours[4];
+    sur_colours(f, needed_colours, cs);
 
     tile* ti = &f->tiles[t];
     // Try matching the colours to the file in 4 different rotations
@@ -93,7 +99,7 @@ int tile_fits(field* f, unsigned int t, coord cs) {
     for (int _r = 0; _r < 4; _r++) {
         int fits = 1;
         for (int s = 0; s < 4; s++) {
-            if (needed_colours[s] == invalid) {
+            if (needed_colours[s] == INVALID) {
                 continue;
             } else if (get_side(*ti, s) != needed_colours[s]) {
                 fits = 0;
@@ -272,4 +278,61 @@ int try_place_any(field* f, coord cs) {
     }
 
     return 0;
+}
+
+const char EMPTY[12] = "eee\neee\neee";
+unsigned int repr_field(char* buf, field* f) {
+    char tile_reprs[f->num_tiles][12];
+
+    // First get representations of all the tiles
+    for (int x = 0; x < f->size; x++) {
+        for (int y = 0; y < f->size; y++) {
+            unsigned int t = idx(f, c(x, y));
+            // Index into tile_reprs that we want
+            unsigned int tri = flatten(f, x, y);
+            if (t == f->num_tiles) {
+                // If there's no tile there
+                memcpy(&tile_reprs[tri][0], &EMPTY, 12 * sizeof(char));
+                continue;
+            }
+            repr_tile(&tile_reprs[tri][0], f->tiles[t]);
+        }
+    }
+
+    // Width (which we want) of one side of tile repr
+    int TR_WIDTH = 3;
+    int num_rows = f->size * TR_WIDTH;
+    int row_width = num_rows + 1;
+    unsigned int buf_len = num_rows * row_width;
+
+    for (int y = 0; y < num_rows; y++) {
+        int start_of_row = y * row_width;
+        // Row offset into tile repr
+        // We add one to skip the newlines
+        int tri = (y % TR_WIDTH) * (TR_WIDTH + 1);
+
+        int tile_y = y / TR_WIDTH;
+        for (int tile_x = 0; tile_x < f->size; tile_x++) {
+            char* this_tile = &tile_reprs[flatten(f, tile_x, tile_y)][0];
+            // Start index into `buf`
+            int bi = start_of_row + (tile_x * TR_WIDTH);
+
+            // Copy characters into `buf`
+            memcpy(&buf[bi], &this_tile[tri], 3);
+        }
+
+        if (y != num_rows-1) {
+            buf[start_of_row + row_width - 1] = '\n';
+        } else {
+            buf[start_of_row + row_width - 1] = '\0';
+        }
+    }
+
+    return buf_len;
+}
+
+void print_field(field* f) {
+    char buf[(f->num_tiles * 9) + (f->size * 3)];
+    repr_field(buf, f);
+    printf("%s\n", buf);
 }

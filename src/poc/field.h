@@ -31,6 +31,11 @@ field fcopy(field* f);
 // Free the buffers in `f` (but not the object itself)
 void free_bufs(field* f);
 
+// Write the 4 colours surrounding `cs` in `f` to `buf`.
+//
+// `top` first.
+// If an adjacent space is unoccupied or out of bounds, write `127` for that space.
+void sur_colours(field* f, colour* buf, coord cs);
 // Check if a tile (index `t`) fits into `f` at `(x, y)`.
 //
 // If it does fit, this function will also rotate it appropriately.
@@ -71,5 +76,15 @@ int is_full(field* f);
 //
 // Returns length of data written to `buf`
 unsigned int free_cells(field* f, coord* buf);
+
+// Write a string representation of `f` to `buf`
+//
+// Returns how many characters were written.
+// This value is expected to be `(f.num_tiles * 9) + (3 * f.size`).
+unsigned int repr_field(char* buf, field* f);
+// Print the output of `repr_field` to stdout.
+//
+// Writes a trailing newline.
+void print_field(field* f);
 
 #endif

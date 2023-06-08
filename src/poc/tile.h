@@ -9,6 +9,7 @@ typedef struct {
 } tile;
 
 typedef enum {
+    // this must always start at 0 for logic in other places to work
     top = 0,
     right = 1,
     bottom = 2,
@@ -34,10 +35,17 @@ colour get_side(tile t, side s);
 // `num_colours` should be the length of `colours`.
 int has_cseq(tile t, colour* colours, unsigned int num_colours);
 
-// Write a representation of `t` to stdout, top first
-void print_tile(tile t);
-
 // Get the opposite `side` to `s`
 side opposite(side s);
+
+// Write a representation of `t`, with rotation, to `buf`
+//
+// Always writes exactly 12 characters to buf.
+// Does not write a final newline.
+void repr_tile(char* buf, tile t);
+// Print the output of `repr_tile` to stdout.
+//
+// Writes a trailing newline.
+void print_tile(tile t);
 
 #endif

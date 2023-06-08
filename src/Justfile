@@ -4,6 +4,8 @@ set dotenv-load
 YORK_USER := env_var("YORK_USER")
 
 clean:
+    cd poc && make clean
+    cd poc/tests && make clean
 
 ssh_keepalive:
     ssh -X -o ServerAliveInterval=30 -fN ssh.york.ac.uk

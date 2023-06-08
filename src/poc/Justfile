@@ -9,8 +9,12 @@ run: build
     ./{{ BIN_NAME }}
 alias r := run
 
-build:
-    make {{ BIN_NAME }}
+build *args="":
+    make {{ args }} {{ BIN_NAME }}
+
+debug debugger="gdb" *args="": (build "'CFLAGS=-g -O0'")
+    "{{ debugger }}" {{ args }} {{ BIN_NAME }}
+alias d := debug
 
 test:
     "{{ TEST_DIR }}/run_all.sh"

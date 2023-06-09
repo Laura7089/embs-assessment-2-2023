@@ -48,8 +48,7 @@ flame size output=FLAME_OUT *args="": (build size RAND_EPOCH)
 flame_single size output=FLAME_OUT *args="": (js "flame" size output args)
 
 clean:
-    rm -fv {{ BIN_NAME }}*
-    rm -fv {{ BIN_NAME }}_single*
+    find -iname "{{ BIN_NAME }}*" -not -iname "*.j2"
     rm -fv "{{ TEST_DIR }}/test_*"
     rm -fv perf.*
 alias c := clean

@@ -98,7 +98,23 @@ See performance~\ref{sec:performance}.
 % - repetitive data-crunching operations (eg. rotating tiles) performed by hardware
 % - could perhaps develop custom IP cores for control flow
 
-Unfortunately I was unable to implement any hardware parallelism in the final product.
+Unfortunately I was unable to implement any form of parallelism in the final design.
+
+As a general strategy, I would've used the ARM chip to run high-level control flow and dispatch operations to the reprogrammable hardware.
+Operations I would prioritise for hardware implementation would be repetitive, non-branching operations; some first picks for this might be:
+
+\begin{itemize}
+  \item Tile rotation.
+    If tiles were kept in shared memory, and read directly from there by the ARM chip, then the FPGA could mass-rotate tiles (especially assisted by the natural collecting of them into one continuous buffer).
+  \item Tile fitting.
+    Given a set of spaces on the board, one could instruct the device to find tiles to fit into all of them at once.
+    Performance data (\verb|flamegraph| in particular) indicated that my solution spent most of it's time finding tiles to fit into given spots.
+    If this work could be offloaded (and parallelised) it could represent a large speedup.
+  \item Board shifting.
+    While board shifting is something of a ``last resort'' in the algorithm which is not performed often, it is simply a task of copying bits from one places to another (specifically back and forth in \verb|field.inner|).
+\end{itemize}
+
+Further speculation would require rearchitecting of my solution --- I believe it is not well suited to adapting for hardware parallelism.
 
 \newpage
 \section{Evaluation and Testing}
@@ -141,6 +157,7 @@ Figure~\ref{fig:hdmi_debug} and figure~\ref{fig:eth_debug} show this.
 
 For benchmarking on hardware, I inserted a timer around the main \verb|solve| call and printed the result to serial.
 To benchmark on the host, I used a combination of coreutils' \verb|time| and \href{https://github.com/sharkdp/hyperfine}{hyperfine}.
+\href{https://github.com/brendangregg/FlameGraph}{Flamegraph} and \verb|perf| also provided valuable insights into functions which execution was spending the most time in, though these tools were not used to gather the final performance data.
 
 In both cases I tried to run a large array of random inputs in all possible sizes; the means of these runs are shown below.
 Supporting this process on my personal machine was a python script to generate puzzle prompts at random, and write them into c headers that I could link into test builds.
@@ -152,20 +169,39 @@ Supporting this process on my personal machine was a python script to generate p
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.8\textwidth]{fpga_perf}
-  \caption{FPGA Solve Performance}
+  \caption{Target Hardware Solve Performance}
+  \label{fig:fpga_graph}
 \end{figure}
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.8\textwidth]{host_perf}
   \caption{Solve Performance on Personal Device}
+  \label{fig:laptop_graph}
 \end{figure}
 
 % show graphs from data
 % gather data on laptop performance and show
 % extrapolate parallel time reduction with parallelism on laptop?
 
+Figure~\ref{fig:fpga_graph} and figure~\ref{fig:laptop_graph} show mean solve time for both single-solution and multi-solution modes on the different hardware.
+
+Several observations can be made:
+
+\begin{enumerate}
+  \item Data is only available for puzzle sizes up to 4.
+    My solution does not produce predictable output for sizes of 5 and above; on hardware, the solve never terminates.
+    I believe this is because the platform does not have enough stack memory available for my method to succeed.
+    This obviously heavily limits what relationships we can infer from the data.
+  \item Solve time is apparently exponentially related to puzzle size\footnote{``puzzle size'' here is the dimension of \textit{one side} of the game board, that is, a $4 \times 4$ game would have a ``puzzle size'' of $4$ and would contain $16$ tiles.}.
+  \item Interestingly, single-solution performance on the target hardware is significantly better than that of multi-solution on the same, but on the laptop this same effect is not reliably present.
+    Indeed, multi-solution performance on target hardware was not good enough to reliably record a sample at puzzle size 4.
+\end{enumerate}
+
 \subsection{Discussion}
+
+In addition to areas of discussion above, I also think that the recursive nature of my design was a serious flaw.
+It increased the difficulty of both debugging and introducing parallelism, and generally made the program very difficult to reason about.
 
 % what would I have done differently?
 

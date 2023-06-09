@@ -35,10 +35,47 @@ Word Count: \input{./word_count.txt}
 
 \section{System Design}
 
+% design process:
+% - write proof-of-concept code in (ideally) platform-agnostic C on personal computer
+% - write test suite to confirm correctness on laptop where it's much easier to run and capture results
+% - create project for hardware, hook in ethernet and HDMI minimum viable products
+% - copy in proof-of-concept code and perform minimal required process to hook up to hardware IO
+% - continued relative separation of IO interfacing code and solving algorithm allows quick iteration of algo code on laptop where it's easier to do
+
+% - recursive solving method
+% - expand from bottom left corner, shift entire puzzle up or right when can't place any further tiles
+% - terminate after a certain number of solutions have been found, or iteration is complete
+
+% primary data structures:
+% - tile, in final form just a 4-byte array
+% - field, consists primarily of an array of tiles and a mapping of "board" locations to indexes into tile array
+%   - index logic implemented is stride-flattened
+
+% no hardware parallelism
+
 \newpage
 \section{Parallelism in the System}
 
+% no hardware parallelism, but in theory:
+% - IO operations and high level decision making run on ARM
+% - control flow also on arm, ie. recursive calls
+% - repetitive data-crunching operations (eg. rotating tiles) performed by hardware
+% - could perhaps develop custom IP cores for control flow
+
 \newpage
 \section{Evaluation and Testing}
+
+% methods:
+% - manual running on target hardware and visually confirming functionality
+%   - debug over serial with custom printing if necessary
+%     - show screenshots of serial/photos of hdmi
+% - test suite on laptop using open source unit testing framework unity
+% - benchmarking tools on laptop:
+%   - hyperfine for statistically robust performance numbers
+%   - flamegraph allows insight into what functions are taking the most time
+
+% show graphs from data
+% gather data on laptop performance and show
+% extrapolate parallel time reduction with parallelism on laptop?
 
 \end{document}

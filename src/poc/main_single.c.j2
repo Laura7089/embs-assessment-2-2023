@@ -1,0 +1,17 @@
+#include <stdio.h>
+#include <string.h>
+#include "tile.h"
+#include "field.h"
+#include "solve.h"
+
+#include "./puzzles/size{{ size }}_{{ epoch }}.h"
+
+int main(int argc, char** argv) {
+    field f = new_field(NTILESROOT);
+    memcpy(f.tiles, TILES, NTILES * sizeof(tile));
+
+    field solved = solve_to_first(&f);
+    print_field(&solved);
+
+    return 0;
+}

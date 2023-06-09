@@ -60,6 +60,20 @@ bench size epoch=RAND_EPOCH *args="": (build size epoch)
 alias b := bench
 bench_single size epoch=RAND_EPOCH *args="": (js "bench" size epoch args)
 
+bench_data start="2" end="4" epoch=RAND_EPOCH out="bench_data.json" *args="":
+    #!/bin/bash
+    set -euxo pipefail
+
+    cmds=""
+
+    for size in {{ '{' }}{{ start }}..{{ end }}{{ '};' }} do
+        just build $size {{ epoch }}
+        just build_single $size {{ epoch }}
+        cmds="$cmds ./main_${size}_{{ epoch }} ./main_single_${size}_{{ epoch }}"
+    done
+
+    hyperfine -N {{ args }} --export-json "{{ out }}" -- $cmds
+
 flame size epoch=RAND_EPOCH output=FLAME_OUT *args="": (build size epoch)
     time flamegraph \
         -o "{{ output }}" \

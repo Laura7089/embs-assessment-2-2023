@@ -74,6 +74,46 @@ void browse_solutions(field* fields, int num_fields) {
 	}
 }
 
+void solve_8(field* f) {
+	// Solve it
+	printf("\nTrying to solve...\n");
+	// Set up timing
+	XTime startTime, endTime;
+	field solved[MAX_SOLVED];
+	XTime_GetTime(&startTime);
+
+	int num_solved = solve(solved, f);
+
+	XTime_GetTime(&endTime);
+	float elapsed = 1000.0 * (endTime - startTime) / COUNTS_PER_SECOND;
+	printf("Solving finished in %fms\n", elapsed);
+
+	if (!num_solved) {
+		printf("Couldn't find any solutions	\n");
+	} else {
+		printf("Found %d solutions, opening browser\n", num_solved);
+		browse_solutions(solved, num_solved);
+	}
+}
+
+void solve_1(field* f) {
+	// Solve it
+	printf("\nTrying to solve...\n");
+	// Set up timing
+	XTime startTime, endTime;
+	XTime_GetTime(&startTime);
+
+	field solved = solve_to_first(f);
+
+	XTime_GetTime(&endTime);
+	float elapsed = 1000.0 * (endTime - startTime) / COUNTS_PER_SECOND;
+	printf("Solving finished in %fms\n", elapsed);
+
+	printf("First Solution:\n");
+	print_field(&solved);
+	show_field_hdmi(&solved);
+}
+
 void udp_get_handler(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_addr_t *addr, u16_t port) {
     // Check that a valid protocol control block was received
     if (p) {
@@ -104,24 +144,17 @@ void udp_get_handler(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_ad
         }
 
         // Solve it
-        printf("\nTrying to solve...\n");
-        // Set up timing
-        XTime startTime, endTime;
-        field solved[MAX_SOLVED];
-        XTime_GetTime(&startTime);
+        printf("\nYou may either run solving until it finds the first solution, or until it finds up to 8.\n");
+		printf("Enter 1 to find up to 8, or 2 to find the first\n");
 
-        int num_solved = solve(solved, &f);
+		char choice[2];
+		scanf("%2s", choice);
 
-        XTime_GetTime(&endTime);
-        float elapsed = 1000.0 * (endTime - startTime) / COUNTS_PER_SECOND;
-        printf("Solving finished in %fms\n", elapsed);
-
-        if (!num_solved) {
-        	printf("Couldn't find any solutions	\n");
-        } else {
-        	printf("Found %d solutions, opening browser\n", num_solved);
-        	browse_solutions(solved, num_solved);
-        }
+		if (choice[0] == '1') {
+			solve_8(&f);
+		} else {
+			solve_1(&f);
+		}
 
         pbuf_free(p);
 

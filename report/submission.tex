@@ -46,12 +46,14 @@ Word Count: \input{./word_count.txt}
 % - continued relative separation of IO interfacing code and solving algorithm allows quick iteration of algo code on laptop where it's easier to do
 
 For the project I opted to construct the core puzzle-solving code in platform-agnostic (or close as possible) C code on my personal laptop.
-This let me iterate quickly in a familiar development environment with faster compile times and tools I was more familiar with closer at hand.
+This let me iterate quickly in a familiar development environment, with faster compile times, and tools I was more familiar with closer at hand.
 It also did not require access to the Xilinx tool suite or hardware.
 
-The core code has a clearly-described API that is tested with a unit test suite built on top of the open-source \href{https://github.com/ThrowTheSwitch/Unity}{unity C testing} framework that runs on my laptop and enforces predictable and correct behaviour.
+The core code has a clearly-described API tested with a unit test suite built on top of the open-source \href{https://github.com/ThrowTheSwitch/Unity}{unity C testing} framework that runs on my laptop and enforces predictable and correct behaviour.
 
 \lstinputlisting[language=C, firstline=37, lastline=55, caption=extract of ``public'' API]{../src/poc/field.h}
+
+\lstinputlisting[language=C, firstline=42, lastline=71, caption=unit test extracts]{../src/poc/tests/field.c}
 
 Once I was satisfied with this ``proof-of-concept'' library code, I created barebones Vivado and Vitis projects, assembled the block design required for GPIO (intended for debugging, which I did not use in the end) and HDMI, and hooked in the drivers for HDMI and Ethernet.
 Once I had confirmed the function of the Ethernet packet parsing and HDMI display, I copied in my library code and called it from the hardware IO code.
@@ -76,20 +78,19 @@ The primary data structures used by my application are:
 \lstinputlisting[language=C, firstline=6, lastline=18, caption=field struct definition]{../src/poc/field.h}
 
 I chose this structure with the intention of keeping data contiguous in memory --- which I theorise would allow easier hardware parallelism with bulk operations --- and to minimise the amount of hot-path memory copying required.
-I initially experimented with making the buffers in \verb|field| dynamically heap-allocated buffers, but experimentation showed that arrays on the stack fixed at the maximum size (ie.\ $8 \times 8$) performed better\footnote{this is almost certainly owing to overhead of allocating and freeing}.
+I initially experimented with making the buffers in \verb|field| dynamically heap-allocated buffers, but experimentation showed that arrays on the stack fixed at the maximum size (ie.\ $8 \times 8$) performed better\footnote{this is almost certainly owing to overhead of allocating and freeing}\footnote{while stack arrays do perform better, my solution still contains quite a lot of copying to avoid mutating the working state under callers' noses --- if this issue could be solved I would expect another moderate performance benefit}.
 
 % - recursive solving method
 % - expand from bottom left corner, shift entire puzzle up or right when can't place any further tiles
 % - terminate after a certain number of solutions have been found, or iteration is complete
 
-The solving method I eventually settled on for the problem is a recursive algorithm which rotates and then places a tile in the first available spot (defined as bottom-to-top, left-to-right) and then calls itself.
+The solving method I eventually settled on for the problem is a recursive algorithm which rotates and then places a tile in the first available spot (defined as bottom-to-top, left-to-right) and then calls itself, repeating until the board is filled or no more tiles fit.
 In addition, it will ``shunt'' or ``push'' the whole game board towards the top-right corner of the play area and repeat the process; this approach should give all possible solutions.
 This is effectively a depth-first search algorithm.
 
 I implemented a configurable hard limit on how many solutions could be found before the search is terminated; however, the performance implications of this are not as straightforward as first expected.
 See performance~\ref{sec:performance}.
 
-\newpage
 \section{Parallelism in the System}
 
 % no hardware parallelism, but in theory:
@@ -116,7 +117,6 @@ Operations I would prioritise for hardware implementation would be repetitive, n
 
 Further speculation would require rearchitecting of my solution --- I believe it is not well suited to adapting for hardware parallelism.
 
-\newpage
 \section{Evaluation and Testing}
 
 \subsection{Testing and Benchmarking Methods}\label{sec:testing_benchmarking}

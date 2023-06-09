@@ -4,7 +4,7 @@ SOURCE_DIR := "../source"
 ROOT_TEX_FILE := "./submission.tex"
 
 # Compile a report, select builder dynamically
-report:
+report: supporting
     tectonic "{{ ROOT_TEX_FILE }}"
 
 # Create all supporting material

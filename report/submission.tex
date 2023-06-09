@@ -2,10 +2,11 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[nottoc,numbib]{tocbibind}
-\usepackage[a4paper, margin=2cm]{geometry}
+\usepackage[a4paper, margin=3cm]{geometry}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage{hyperref}
 
 % From https://tex.stackexchange.com/questions/116534/lstlisting-line-wrapping
 \usepackage{listings}
@@ -35,23 +36,53 @@ Word Count: \input{./word_count.txt}
 
 \section{System Design}
 
-% design process:
+\subsection{Design Process}
+
+For the project I opted to construct the core puzzle-solving code in platform-agnostic (or close as possible) C code on my personal laptop.
+This let me iterate quickly in a familiar development environment with faster compile times and tools I was more familiar with closer at hand.
+It also did not require access to the Xilinx tool suite or hardware.
+
+% TODO: quote an API example
+% TODO: cite Unity
+The core code has a clearly-described API that is tested with a unit test suite built on top of the open-source \href{https://github.com/ThrowTheSwitch/Unity}{unity C testing} framework that runs on my laptop and enforces predictable and correct behaviour.
+
+Once I was satisfied with this ``proof-of-concept'' library code, I created barebones Vivado and Vitis projects, assembled the block design required for GPIO (intended for debugging, which I did not use in the end) and HDMI, and hooked in the drivers for HDMI and Ethernet.
+Once I had confirmed the function of the Ethernet packet parsing and HDMI display, I copied in my library code and called it from the hardware IO code.
+
+I continued to iterate over the hardware-related (mostly I/O) section of the application on the ARM core on the Z7 and visually confirmed the results through the HDMI display and the serial console. See the testing section~\ref{sec:testing_benchmarking} for more.
+
 % - write proof-of-concept code in (ideally) platform-agnostic C on personal computer
 % - write test suite to confirm correctness on laptop where it's much easier to run and capture results
 % - create project for hardware, hook in ethernet and HDMI minimum viable products
 % - copy in proof-of-concept code and perform minimal required process to hook up to hardware IO
 % - continued relative separation of IO interfacing code and solving algorithm allows quick iteration of algo code on laptop where it's easier to do
 
-% - recursive solving method
-% - expand from bottom left corner, shift entire puzzle up or right when can't place any further tiles
-% - terminate after a certain number of solutions have been found, or iteration is complete
+\subsection{Algorithmic Design}
 
 % primary data structures:
 % - tile, in final form just a 4-byte array
 % - field, consists primarily of an array of tiles and a mapping of "board" locations to indexes into tile array
 %   - index logic implemented is stride-flattened
 
-% no hardware parallelism
+The primary data structures used by my application are:
+
+\begin{itemize}
+  \item A simple array of 4 bytes for each tile, which is rotated in-place to try different fits into a slot.
+  \item A struct-of-arrays style struct \verb|field| which primarily holds a list of tiles, and a buffer representing the play field that maps coordinates to tiles (specifically, an index into the tile list).
+    The struct also contains a buffer that caches whether tiles have been placed (to avoid searching the field for them), and the dimensions of the play field.
+\end{itemize}
+
+I chose this structure with the intention of keeping data contiguous in memory --- which I theorise would allow easier hardware parallelism with bulk operations --- and to minimise the amount of hot-path memory copying required.
+I initially experimented with making the buffers in \verb|field| dynamically heap-allocated buffers, but experimentation showed that arrays on the stack fixed at the maximum size (ie.\ $8 \times 8$) performed better\footnote{this is almost certainly owing to overhead of allocating and freeing}.
+
+% - recursive solving method
+% - expand from bottom left corner, shift entire puzzle up or right when can't place any further tiles
+% - terminate after a certain number of solutions have been found, or iteration is complete
+
+The solving method I eventually settled on for the problem is a recursive algorithm which rotates and then places a tile in the first available spot (defined as bottom-to-top, left-to-right) and then calls itself.
+In addition, it will ``shunt'' or ``push'' the whole game board towards the top-right corner of the play area and repeat the process; this approach should give all possible solutions.
+I implemented a configurable hard limit on how many solutions could be found before the search is terminated; however, the performance implications of this are not as straightforward as first expected.
+See performance~\ref{sec:performance}.
 
 \newpage
 \section{Parallelism in the System}
@@ -62,20 +93,44 @@ Word Count: \input{./word_count.txt}
 % - repetitive data-crunching operations (eg. rotating tiles) performed by hardware
 % - could perhaps develop custom IP cores for control flow
 
+Unfortunately I was unable to implement any hardware parallelism in the final product.
+
 \newpage
 \section{Evaluation and Testing}
 
-% methods:
+\subsection{Testing and Benchmarking Methods}\label{sec:testing_benchmarking}
+
 % - manual running on target hardware and visually confirming functionality
 %   - debug over serial with custom printing if necessary
 %     - show screenshots of serial/photos of hdmi
 % - test suite on laptop using open source unit testing framework unity
-% - benchmarking tools on laptop:
-%   - hyperfine for statistically robust performance numbers
+% - python script (include me) that generates problems on demand that can be linked into runs
+% - tools on laptop:
+%   - hyperfine for statistically robust performance figures
 %   - flamegraph allows insight into what functions are taking the most time
+%   - gdb gives some insight into step-by-step logic, but recursive nature of design means navigation through debugging interfaces is very hard
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{HDMI_screenout}
+  \includegraphics[width=0.5\textwidth]{HDMI_serialout}
+  \caption{HDMI output of a preset problem with accompanying serial output}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{eth_serialout}
+  \caption{Ethernet connection debugging information printed on boot}
+\end{figure}
+
+\subsection{Performance}\label{sec:performance}
 
 % show graphs from data
 % gather data on laptop performance and show
 % extrapolate parallel time reduction with parallelism on laptop?
+
+\subsection{Discussion}
+
+% what would I have done differently?
 
 \end{document}

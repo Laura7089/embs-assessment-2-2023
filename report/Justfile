@@ -22,7 +22,7 @@ exam_number:
 
 # Count words in the report
 wordcount question="1":
-    detex {{ ROOT_TEX_FILE }} \
+    detex -w {{ ROOT_TEX_FILE }} \
         | wc -w > ./word_count.txt
 
 clean:

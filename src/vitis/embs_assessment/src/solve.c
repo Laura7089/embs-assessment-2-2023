@@ -3,79 +3,119 @@
 #include "field.h"
 #include "tile.h"
 
-void overwrite(field* l, field* r) {
-    free_bufs(l);
-    *l = *r;
-}
+#include <stdio.h>
 
-int solve_inner(field* f) {
-    coord* frees = malloc((f->num_tiles-1) * sizeof(coord));
-    unsigned int num_free = free_cells(f, frees);
-
-    // Base case
-    if (num_free == 1) {
-        if (try_place_any(f, frees[0])) {
+int already_solved(field* f, field* solved, int num_solved) {
+    for (int i = 0; i < num_solved; i++) {
+        if (placement_equal(f, &solved[i])) {
             return 1;
-        } else {
-            return 0;
         }
-    }
-
-    // Recursive case(s)
-    // Case 1: plain ol' placing
-    for (int i = 0; i < num_free; i++) {
-        field fs = fcopy(f);
-        if (try_place_any(&fs, frees[i])) {
-            if (solve_inner(&fs)) {
-                overwrite(f, &fs);
-                return 1;
-            }
-        }
-        free_bufs(&fs);
-    }
-
-    // Case 2: start shiftin'
-    for (int d = 0; d < 4; d++) {
-        if (touches_edge(f, d)) {
-            // We can't shift in this direction
-            continue;
-        }
-
-        // Make a copy and shift it in the given direction
-        field fs = fcopy(f);
-        shift(&fs, d);
-
-        // Try to place a tile
-        // We have to try to place one otherwise the `solve` calls will keep shifting back and forth
-        coord* frees = malloc(num_unplaced(&fs) * sizeof(coord));
-        unsigned int num_free = free_cells(&fs, frees);
-        for (int i = 0; i < num_free; i++) {
-            // Make another copy
-            field fsp = fcopy(&fs);
-
-            // Try to place something
-            if (try_place_any(&fsp, frees[i])) {
-                if (solve_inner(&fsp)) {
-                    overwrite(f, &fsp);
-                    return 1;
-                }
-            }
-            free_bufs(&fsp);
-        }
-        free_bufs(&fs);
     }
 
     return 0;
 }
 
+// Get the next cell that should be filled
+//
+// If the grid is filled, returns an oob coord
+coord next_free(field* f) {
+    for (int x = 0; x < f->size; x++) {
+        for (int y = 0; y < f->size; y++) {
+            coord cs = c(x, y);
+            if (idx(f, cs) == f->num_tiles) {
+                return cs;
+            }
+        }
+    }
+    return c(f->size, f->size);
+}
+
+void solve_inner(field* f, field* solved, int* num_solved, int max) {
+    if (*num_solved == max) {
+        return;
+    }
+
+    /* printf("Solve called with:\n"); */
+    /* print_field(f); */
+
+    {
+        coord nf = next_free(f);
+        /* printf("Next free spot: (%d, %d)\n", nf.x, nf.y); */
+
+        // Base case
+        if (num_unplaced(f) == 1) {
+            solved[*num_solved] = fcopy(f);
+            if (try_place_any(&solved[*num_solved], nf)) {
+                if (!already_solved(&solved[*num_solved], solved, *num_solved)) {
+                    /* printf("Base case found:\n"); */
+                    /* print_field(&solved[*num_solved]); */
+                    *num_solved += 1;
+                }
+            }
+            // Return immediately because there's no point recursing here
+            /* printf("Returning, there's nothing to do\n"); */
+            return;
+        }
+
+        // Recursive Case 1: plain ol' placing
+        for (int t = 0; t < f->num_tiles; t++) {
+            field fs = fcopy(f);
+            if (try_place(&fs, t, nf)) {
+                solve_inner(&fs, solved, num_solved, max);
+                if (*num_solved == max) {
+                    return;
+                }
+            }
+        }
+    }
+
+    // No shift if the field is empty.
+    if (num_unplaced(f) == f->num_tiles) {
+        /* printf("Skipping shifts"); */
+        return;
+    }
+
+    // Recursive Case 2: start shiftin'
+    //
+    // Only shift towards the top or the right.
+    for (int d = 0; d < 2; d++) {
+        if (touches_edge(f, d)) {
+            continue;
+        }
+
+        // Make a copy and shift it
+        field fs = fcopy(f);
+        shift(&fs, d);
+        coord nf = next_free(&fs);
+        /* printf("Shifted %d\n", d); */
+        // Try to place something
+        for (int t = 0; t < fs.num_tiles; t++) {
+            if (try_place(&fs, t, nf)) {
+                solve_inner(&fs, solved, num_solved, max);
+                if (*num_solved == max) {
+                    return;
+                }
+            }
+        }
+    }
+
+    /* printf("End reached\n\n"); */
+}
+
+
 int solve(field* solved, field* f) {
     field fi = fcopy(f);
 
-    place(&fi, 0, c(0, 0));
-    if (solve_inner(&fi)) {
-        solved[0] = fi;
-        return 1;
-    } else {
-        return 0;
-    }
+    int num_solved = 0;
+    solve_inner(&fi, solved, &num_solved, MAX_SOLVED);
+    return num_solved;
+}
+
+field solve_to_first(field* f) {
+    field fi = fcopy(f);
+
+    field solved;
+    int num_solved = 0;
+    solve_inner(&fi, &solved, &num_solved, 1);
+    return solved;
 }

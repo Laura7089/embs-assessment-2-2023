@@ -171,7 +171,7 @@ int main()
     	};
 
     	field sample = new_field(4);
-    	sample.tiles = SAMPLE_TILES;
+    	memcpy(sample.tiles, SAMPLE_TILES, sizeof(tile) * 16);
 
     	for (int i = 0; i < 16; i++) {
     		sample.placed[i] = 1;

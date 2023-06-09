@@ -3,6 +3,23 @@
 #include <stdio.h>
 #include "field.h"
 
+field new_field(unsigned int size) {
+    field f;
+    f.size = size;
+    f.num_tiles = size * size;
+
+    for (int i = 0; i < f.num_tiles; i++) {
+        f.inner[i] = f.num_tiles;
+        f.placed[i] = 0;
+    }
+
+    return f;
+}
+
+field fcopy(field* f) {
+    return *f;
+}
+
 // Get index into `f.inner` that `(cs.x, cs.y)` represent
 //
 // Not part of public API
@@ -256,6 +273,32 @@ unsigned int free_cells(field* f, coord* buf) {
     return bi;
 }
 
+unsigned int free_cells_dir(field* f, coord* buf, side d) {
+    if (is_full(f)) {
+        return 0;
+    }
+
+    unsigned int bi = 0;
+
+    for (int x = 0; x < f->size; x++) {
+        for (int y = 0; y < f->size; y++) {
+            coord cs = c(x, y);
+            if (idx(f, cs) != f->num_tiles) {
+                // There's already a tile here
+                continue;
+            }
+
+            if (idxo(f, cs, d) != f->num_tiles) {
+                // There's a placed tile adjacent!
+                buf[bi] = cs;
+                bi += 1;
+            }
+        }
+    }
+
+    return bi;
+}
+
 int try_place(field* f, unsigned int t, coord cs) {
     if (f->placed[t] || idx(f, cs) != f->num_tiles) {
         return 0;
@@ -336,4 +379,17 @@ void print_field(field* f) {
     char buf[(f->num_tiles * 9) + (f->size * 3)];
     repr_field(buf, f);
     printf("%s\n", buf);
+}
+
+int placement_equal(field* l, field* r) {
+    for (int t = 0; t < l->num_tiles; t++) {
+        if (l->inner[t] != r->inner[t]) {
+            return 0;
+        }
+        if (l->tiles[t].rotation != r->tiles[t].rotation) {
+            return 0;
+        }
+    }
+
+    return 1;
 }

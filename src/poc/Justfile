@@ -1,27 +1,49 @@
 #!/bin/env -S just --justfile
 
-TEST_DIR := "./tests"
-BIN_NAME := "main"
 SVG_VIEWER := env_var_or_default("BROWSER", "firefox")
 FLAME_OUT := `mktemp --tmpdir -u embs_poc_flameXXXX.svg`
 RAND_EPOCH := `echo $(($RANDOM % 10))`
-DEBUG_CFLAGS := "'CFLAGS=-g -O0'"
+
+SOURCES := "tile.c solve.c field.c"
+TEST_DIR := "./tests"
+PUZZLES_DIR := "./puzzles"
+BIN_NAME := "main"
+
+CC := "gcc"
+CFLAGS := "-O3"
+DEBUG_CFLAGS := "-g -O0"
+
 [private]
 js recipe *args:
     just BIN_NAME={{ BIN_NAME }}_single {{ recipe }} {{ args }}
 
 run size epoch=RAND_EPOCH: (build size epoch)
-    time ./{{ BIN_NAME }}
+    time ./{{ BIN_NAME }}_{{ size }}_{{ epoch }}
 alias r := run
 run_single size epoch=RAND_EPOCH: (js "run" size epoch)
 alias rs := run_single
 
-build size epoch=RAND_EPOCH *args="":
-    make SIZE={{ size }} EPOCH={{ epoch }} {{ args }} {{ BIN_NAME }}
+puzzles:
+    [ -f "{{ PUZZLES_DIR }}/size2_0.h" ] || ./generate_set.sh "{{ PUZZLES_DIR }}"
+
+build size epoch=RAND_EPOCH *args="": puzzles
+    #!/bin/bash
+    set -euxo pipefail
+
+    name={{ BIN_NAME }}_{{ size }}_{{ epoch }}
+
+    jinja2 \
+        -D size={{ size }}_{{ epoch }} \
+        {{ BIN_NAME }}.c.j2 \
+        -o $name.c
+    "{{ CC }}" \
+        {{ CFLAGS }} {{ args }} \
+        {{ SOURCES }} $name.c \
+        -o $name
 build_single size epoch=RAND_EPOCH *args="": (js "build" size epoch args)
 
 debug size epoch=RAND_EPOCH debugger="gdb" *args="": (build size epoch DEBUG_CFLAGS)
-    "{{ debugger }}" {{ args }} {{ BIN_NAME }}
+    "{{ debugger }}" {{ args }} {{ BIN_NAME }}_{{ size }}_{{ epoch }}
 alias d := debug
 debug_single size epoch=RAND_EPOCH debugger="gdb" *args="": (js "debug" size epoch debugger args)
 
@@ -34,21 +56,25 @@ bench size epoch=RAND_EPOCH *args="": (build size epoch)
         -N \
         {{ args }} \
         -- \
-        ./{{ BIN_NAME }}
+        ./{{ BIN_NAME }}_{{ size }}_{{ epoch }}
 alias b := bench
 bench_single size epoch=RAND_EPOCH *args="": (js "bench" size epoch args)
 
-flame size output=FLAME_OUT *args="": (build size RAND_EPOCH)
+flame size epoch=RAND_EPOCH output=FLAME_OUT *args="": (build size epoch)
     time flamegraph \
         -o "{{ output }}" \
         {{ args }} \
         -- \
-        ./{{ BIN_NAME }}
+        ./{{ BIN_NAME }}_{{ size }}_{{ epoch }}
     "{{ SVG_VIEWER }}" "{{ output }}"
 flame_single size output=FLAME_OUT *args="": (js "flame" size output args)
 
 clean:
-    find -iname "{{ BIN_NAME }}*" -not -iname "*.j2"
+    find \
+        -iname "{{ BIN_NAME }}*" \
+        -not -iname "*.j2" \
+        -not -ipath "{{ TEST_DIR }}/unity/*" \
+        -exec rm -fv {} \;
     rm -fv "{{ TEST_DIR }}/test_*"
     rm -fv perf.*
 alias c := clean

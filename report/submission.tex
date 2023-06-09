@@ -84,6 +84,8 @@ I initially experimented with making the buffers in \verb|field| dynamically hea
 
 The solving method I eventually settled on for the problem is a recursive algorithm which rotates and then places a tile in the first available spot (defined as bottom-to-top, left-to-right) and then calls itself.
 In addition, it will ``shunt'' or ``push'' the whole game board towards the top-right corner of the play area and repeat the process; this approach should give all possible solutions.
+This is effectively a depth-first search algorithm.
+
 I implemented a configurable hard limit on how many solutions could be found before the search is terminated; however, the performance implications of this are not as straightforward as first expected.
 See performance~\ref{sec:performance}.
 
@@ -113,18 +115,37 @@ Unfortunately I was unable to implement any hardware parallelism in the final pr
 %   - flamegraph allows insight into what functions are taking the most time
 %   - gdb gives some insight into step-by-step logic, but recursive nature of design means navigation through debugging interfaces is very hard
 
+My testing approach was split into two halves.
+
+I would test the core logic on my personal device, utilising unit tests, the lower compilation times and more accessible and familiar tools available there.
+For testing, my primary tools were \href{https://www.gnu.org/software/gdb/}{GNU Debug Bridge}, the Unity unit testing library (see above) and regular stdout print debugging.
+Unfortunately, I found my recursive implementation did not lend itself to GDB well and found it very difficult indeed to step through the program with it.
+
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.5\textwidth]{HDMI_screenout}
   \includegraphics[width=0.5\textwidth]{HDMI_serialout}
   \caption{HDMI output of a preset problem with accompanying serial output}
+  \label{fig:hdmi_debug}
 \end{figure}
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.5\textwidth]{eth_serialout}
   \caption{Ethernet connection debugging information printed on boot}
+  \label{fig:eth_debug}
 \end{figure}
+
+On the hardware side, my primary testing process was simply making incremental changes then confirming them by reprogramming the Zybo board and watching its' outputs.
+Figure~\ref{fig:hdmi_debug} and figure~\ref{fig:eth_debug} show this.
+
+For benchmarking on hardware, I inserted a timer around the main \verb|solve| call and printed the result to serial.
+To benchmark on the host, I used a combination of coreutils' \verb|time| and \href{https://github.com/sharkdp/hyperfine}{hyperfine}.
+
+In both cases I tried to run a large array of random inputs in all possible sizes; the means of these runs are shown below.
+Supporting this process on my personal machine was a python script to generate puzzle prompts at random, and write them into c headers that I could link into test builds.
+
+\lstinputlisting[language=Python, caption=python prompt generator]{../src/poc/generate.py}
 
 \subsection{Performance}\label{sec:performance}
 
